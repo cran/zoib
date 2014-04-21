@@ -41,7 +41,9 @@ model
                   (s1[i,j]-1)*log(y[i,j])+(s2[i,j]-1)*log(1-y[i,j])+
                   loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j]))
       phi[i,j] <- K-ll[i,j]	
-      zero[i,j] ~ dpois(phi[i,j])    
+      zero[i,j] ~ dpois(phi[i,j])   
+
+      ypred[i,j] <-(1-p0[i,j])*p1[i,j] + (1-p0[i,j])*(1-p1[i,j])*mu[i,j]
     }
   }
                                                           

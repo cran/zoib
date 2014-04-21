@@ -29,20 +29,31 @@ http://www.kidsdata.org
 
 \keyword{datasets}
 
+\references{
+Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, submitted
+
+Liu, F. and Li, Q. (2014) A Bayesian Model for Joint Analysis of Multivariate  Repeated Measures and  Time to Event Data in Crossover Trials, Statistical Methods  in Medical Research, doi: 10.1177/0962280213519594
+}
+
 \examples{
   \dontrun{
+  ##### eg3: modelling with clustered beta variables with inflation at 0
   data("AlcoholUse", package = "zoib")
-	AlcoholUse$Grade = as.factor(AlcoholUse$Grade)
+  AlcoholUse$Grade <- as.factor(AlcoholUse$Grade)
 
-  post.obj <- zoib(Percentage ~ Grade+Days+Gender|1|Grade+Days+Gender|1,
-  data = AlcoholUse, random = 1, EUID= AlcoholUse$County,
-  zero.inflation = TRUE,  one.inflation = FALSE, joint = FALSE, 
-  n.iter=1000, n.thin=5)  
-	post.sample <- post.obj$oripara 
-	post.sample.c1<- post.sample[[1]][11:200,]
-	post.sample.c2<- post.sample[[2]][11:200,]
-	post.sample <- mcmc.list(as.mcmc(post.sample.c1),as.mcmc(post.sample.c2))
-	summary(post.sample)
+  post.obj <- zoib(Percentage ~ Grade+Days+Gender+Grade:Days+
+              Grade:Gender+Days:Gender|1|Grade+Days+Gender+Grade:Days+
+              Grade:Gender+Days:Gender|1, data = AlcoholUse, random = 1, 
+              EUID= AlcoholUse$County, zero.inflation = TRUE, one.inflation = FALSE, 
+               joint = FALSE, n.iter=5000, n.thin=20, n.burn=1000) 
+	coeff <- post.obj$coeff
+  traceplot(coeff)
+  autocorr.plot(coeff) 
+  check.psrf(coeff)
+	summ <- summary(coeff))
+  
+  post.mean= apply(rbind(post.obj$ypred[[1]],post.obj$ypred[[2]]), 2, mean); 
+  plot(AlcoholUse$Percentage,post.mean); abline(0,1,col='red')
   }
 }
 

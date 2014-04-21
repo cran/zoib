@@ -48,9 +48,9 @@ Fang Liu (fang.liu.131@nd.edu)
 }
 
 \examples{
-  #\dontrun{
+  \dontrun{
 	post1= data.frame(cbind(rnorm(400,0,1), rbeta(400,2,3)))
 	post2= data.frame(cbind(rnorm(400,0,1), rbeta(400,2,3)))
 	check.psrf(post1,post2)
-	#}
+	}
 }

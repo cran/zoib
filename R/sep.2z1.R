@@ -34,6 +34,12 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
   dataIn[[21]] <- nEU
   
   init <- function( ){
+    
+    rho1 <- runif(1,0,0.999)
+    rho2 <- runif(1,0,0.999) 
+    rho3 <- runif(1, rho1*rho2 - sqrt((1-rho1^2)*(1-rho2^2)), 
+                  rho1*rho2 + sqrt((1-rho1^2)*(1-rho2^2)))
+    return(
     list("b.tmp"  = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
          "d.tmp"  = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
          "b1.tmp" = matrix(rnorm((p.x1-1)*4,0,0.1), ncol=4),
@@ -50,12 +56,15 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
          "taud.L2" = runif(1,0,2),
          "taub1.L2" = runif(1,0,2),
          
+         "rho1" = rho1,
+         "rho2" = rho2,
+         "rho3" = rho3,
+         
          "sigma.VC1" = runif(nz0,0,2),
-         "xi1" = runif(nz0,0,1),
-         "eta1" = runif(nz0,0,1),
+         "t" = runif(nz0,0,1),         
          
          "scale1" = runif(qz,0,2),
-         "scale2" = runif(qz,0,2))}            
+         "scale2" = runif(qz,0,2)))}            
   inits=list(init( ));
   if(n.chain>=2) {for(j in 2:n.chain) inits <- c(inits,list(init( )))}  
   op<- system.file("bugs", "sep_2z1.bug",package="zoib") 

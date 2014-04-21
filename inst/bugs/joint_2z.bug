@@ -24,6 +24,8 @@ model
                   loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j])
       phi[i,j] <- K-ll[i,j]	
       zero[i,j] ~ dpois(phi[i,j])    
+
+      ypred[i,j] <- mu[i,j]
     }
   }
                                                           

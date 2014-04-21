@@ -30,7 +30,9 @@ model
             (1-d1[i])*((s1[i]-1)*log(y[i])+(s2[i]-1)*log(1-y[i])+
                 loggam(s1[i]+s2[i])-loggam(s1[i])-loggam(s2[i]))
     phi[i] <- K-ll[i]	
-    zero[i] ~ dpois(phi[i])    
+    zero[i] ~ dpois(phi[i])  
+    
+    ypred[i] <- p1[i] + (1-p1[i])*mu[i]
   }
 
 
@@ -108,7 +110,7 @@ model
       
   xi ~ dnorm(0.0001,pow(hyper[6],-2)) # half-t 
   eta ~ dgamma(0.5, 0.5)   
-  sigma2 <- abs(xi)*sqrt(eta) 
+  sigma2 <- abs(xi)/sqrt(eta) 
     
   invsigma <- pow(sigma1,-2)*prior2[1,1] + pow(sigma2,-2)*prior2[1,2]
 

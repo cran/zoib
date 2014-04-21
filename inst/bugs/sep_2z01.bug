@@ -39,7 +39,9 @@ model
                 loggam(s1[i]+s2[i])-loggam(s1[i])-loggam(s2[i]))
 
     phi[i] <- K-ll[i]	
-    zero[i] ~ dpois(phi[i])    
+    zero[i] ~ dpois(phi[i]) 
+
+    ypred[i] <-(1-p0[i])*p1[i] + (1-p0[i])*(1-p1[i])*mu[i]
   }
 
   #################      regression coeff   ################## 

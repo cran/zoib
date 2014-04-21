@@ -17,11 +17,11 @@ Proportion of crude oil converted to gasoline after distillation and fractionati
   \item{\code{batch}}{crude oil batch ID.}}
 }
 \details{
-This is a subset of the data GasolineYield in R package "betareg". Refer to the detailed description in R package "betareg".
+The Gasoline Yields Data is a subset of the data GasolineYield in R package "betareg". Refer to the detailed description in R package "betareg".
 }
 
 \references{
-Liu, F. and Kong, Y. (2014). ZOIB:  an R Package for Bayesian Inferences in Zero One Inflated Beta Regression Model, submitted
+Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, submitted
 
 Liu, F. and Li, Q. (2014) A Bayesian Model for Joint Analysis of Multivariate  Repeated Measures and  Time to Event Data in Crossover Trials, Statistical Methods  in Medical Research, doi: 10.1177/0962280213519594
 
@@ -29,19 +29,56 @@ Cribari-Neto F. and Zeileis A. (2010), Beta Regression in R. Journal of Statisti
 }
 
 \examples{
-  #\dontrun{
+  \dontrun{
+  library(zoib)
   data("GasolineYield", package = "zoib")
-  GasolineYield$batch <- as.factor(GasolineYield$batch)
   
-	# fixed effects zoib with batch treated as a 10-level qualitative variable
-	eg.fixed <- zoib(yield ~ temp + as.factor(batch)| 1, data=GasolineYield,
-  joint = FALSE,  random = 0, EUID = 1:nrow(GasolineYield),
-  zero.inflation = FALSE, one.inflation = FALSE,
-  n.iter = 100, n.thin = 5)
-	post.sample<- eg.fixed$oripara 
-	traceplot(post.sample)
-	autocorr.plot(post.sample)
-	gelman.diag(post.sample)
-	summary(post.sample)
-	#}
+  #################################################
+	#  fixed effects zoib with 
+  #  batch as a 10-level qualitative variable
+  ################################################
+
+  eg.fixed <- zoib(yield ~ temp + as.factor(batch)| 1, data=GasolineYield,
+                 joint = FALSE,  random = 0, EUID = 1:nrow(d),
+                 zero.inflation = FALSE, one.inflation = FALSE,
+                 n.iter = 1100, n.thin = 5, n.burn=100)
+  # yieds 400 posterior draws (200 per chain) on the parameters of interest
+  
+  # posterior draws of the regression coefficients
+  coeff <- mcmc(eg.fixed$coef)
+	traceplot(coeff)
+	autocorr.plot(coeff, lag.max=5)
+	check.psrf(coeff)
+	summ1 <- summary(coeff)
+     
+  # Design Matrix: Xb, Xd, Xb0, Xb1
+  eg.fixed$Xb; eg.fixed$Xd;  eg.fixed$Xb0; eg.fixed$Xb1  
+  
+  # Posterior predictive values of Y
+  ypred = rbind(eg.fixed$ypred[[1]],eg.fixed$ypred[[2]])
+  post.mean= apply(ypred,2,mean); 
+  plot(GasolineYield$yield, post.mean, col='blue',pch=2); 
+  abline(0,1,col='red')
+  
+  ######################################################
+  #  mixed effects zoib with batch as a random variable
+  #####################################################
+  eg.random <- zoib(yield ~ temp | 1 | 1, data=GasolineYield,
+                  joint = FALSE, random=1, EUID=GasolineYield$batch,
+                  zero.inflation = FALSE, one.inflation = FALSE,
+                  n.iter=3200, n.thin=15, n.burn=200)
+
+  # check convergence on the regression coefficients
+  sample2 <- eg.random$coeff
+  traceplot(sample2)
+  autocorr.plot(sample2) 
+  check.psrf(coeff)
+  summary(mcmc(sample2))
+
+  # predicted y 
+  ypred = rbind(eg.random$ypred[[1]],eg.random$ypred[[2]])
+  post.mean= apply(ypred,2,mean); 
+  plot(GasolineYield$yield, post.mean, col='blue',pch=2); 
+  abline(0,1,col='red')
+	}
 }

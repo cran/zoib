@@ -20,6 +20,8 @@ model
                   loggam(s[i,1]+s[i,2])-loggam(s[i,1])-loggam(s[i,2])
       phi[i] <- K-ll[i]
       zero[i] ~ dpois(phi[i]) 
+      ypred[i] <- mu[i]
+
   }
 
   #################      regression coeff   ################## 

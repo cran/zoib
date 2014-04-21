@@ -31,6 +31,8 @@ model
 
     phi[i] <- K-ll[i]	
     zero[i] ~ dpois(phi[i])    
+
+    ypred[i] <- p1[i] + (1-p1[i])*mu[i]
   }
 
   #################      regression coeff   ################## 

@@ -25,11 +25,15 @@ function(
   scale.halft = 20,
   
   n.chain = 2,
-  n.iter = 5000,
+  n.iter = 5000, 
+  n.burn = 200,
   n.thin = 2
 )
                     
 { 
+  # the model equation for output, ow, the jags model would be by default
+  model.format <- model
+  
   cl <- match.call()
   if(missing(data)) data <- environment(model)
   mf <- match.call(expand.dots = FALSE)
@@ -83,7 +87,7 @@ function(
       chai <- strsplit(Fc[3], " ")
       bar.pos <- which(chai[[1]]=="|")
       rand.part <- chai[[1]][(bar.pos[3]+1):length(chai[[1]])]
-      zname <- rand.part[which(rand.part!="+")]
+      zname <- rand.part[which(rand.part!="+")] 
       if(all(zname=='1')) zname='int'
       else zname <- c("int",zname)                       
     }
@@ -238,7 +242,8 @@ function(
         model[[i]]<-  fixed(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, prior1,prec.int, 
                             prec.DN,lambda.L1,lambda.L2,lambda.ARD, link, n.chain)   
         para.list <- c("b","d")}
-
+      
+      para.list <- c(para.list,"ypred")    
       print(para.list)
       post.samples[[i]]<- coda.samples(model[[i]], para.list, n.iter=n.iter, thin=n.thin) 
 
@@ -292,7 +297,6 @@ function(
       model<- model[[1]]; 
       post.samples<- post.samples[[1]]; 
       post.samples.raw<- post.samples.raw[[1]]}
-    return(list(model=model, oripara=post.samples.raw))
   }  
   
   ########## random effect models  ############################
@@ -345,7 +349,8 @@ function(
       qz <- sum(m)
       zdummy <- matrix(0,n,qz)
       
-      id<-  0      
+      id <- 0 
+      zdummy[,1]=1
       for(j in 2:nz0)
       {  
         id <- id+m[j-1] 
@@ -361,8 +366,7 @@ function(
 
       meanz<- apply(as.data.frame(zdummy[,2:qz]),2,mean)
       sdz  <- apply(as.data.frame(zdummy[,2:qz]),2,sd) 
-      }
-  }    
+      }  
    
     ########################################################
     # 5-12: random, separate modeling
@@ -408,7 +412,7 @@ function(
                                 prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
                                 scale.unif, scale.halft,link, n.chain) 
             para.list <- c("b","d", "Sigma")}
-          post.samples[[i]]<- coda.samples(model[[i]], para.list, thin=n.thin, n.iter=n.iter)
+
         }
         else   
         { 
@@ -424,7 +428,7 @@ function(
                                  prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
                                  scale.unif, scale.halft, link, n.chain) 
             para.list <- c("b","d", "b1","sigma")  }
-          else if(!one.inflation[i] & zero.inflation[i]){  
+          else if(!one.inflation[i] & zero.inflation[i]){
             model[[i]]<- sep.1z0(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
                                  rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
                                  prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
@@ -436,10 +440,12 @@ function(
                                 prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,  
                                 scale.unif, scale.halft, link, n.chain)
             para.list <- c("b","d", "sigma")}
-          post.samples[[i]]<- coda.samples(model[[i]], para.list, thin=n.thin, n.iter=n.iter)
         }
         
+        para.list <- c(para.list, "ypred") 
         print(para.list)
+        post.samples[[i]]<- coda.samples(model[[i]], para.list, thin=n.thin, n.iter=n.iter)
+        
         dim.para  <- dim(post.samples[[i]][[1]]) 
         name.para <- colnames(post.samples[[i]][[1]])
         post.samples.raw <- post.samples
@@ -489,7 +495,6 @@ function(
         model<- model[[1]]; 
         post.samples<- post.samples[[1]]; 
         post.samples.raw<- post.samples.raw[[1]]}
-      return(list(model=model,  oripara=post.samples.raw))
     }
     ########################################################
     # 13-20: random, joint modeling
@@ -520,7 +525,7 @@ function(
                             prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
                             scale.unif, scale.halft,link, n.chain) 
           para.list <- c("b","d", "b0","Sigma")}
-        else  if(any(one.inflation) & all(!zero.inflation)) { 
+        else if(any(one.inflation) & all(!zero.inflation)) { 
           inflate1 <- rep(0,q)
           for(j in 1:q){ 
             if(one.inflation[j]) inflate1[j]<- 1}
@@ -578,8 +583,10 @@ function(
                             scale.unif, scale.halft,link, n.chain) 
           para.list <- c("b","d", "sigma")}
       }
-      post.samples <- coda.samples(model, para.list, thin=n.thin, n.iter=n.iter)
+      para.list <- c(para.list, "ypred") 
       print(para.list)
+      post.samples <- coda.samples(model, para.list, thin=n.thin, n.iter=n.iter)
+
       
       dim.para  <- dim(post.samples[[1]]) 
       name.para <- colnames(post.samples[[1]])
@@ -640,7 +647,44 @@ function(
               Sigma<- matrix(tmp[m2,k:(k+qz^2-1)],qz,qz)
               post.samples.raw[[j]][m2,k:(k+qz^2-1)]<- c(L%*%Sigma%*%t(L))}}
           break}}
-      return(list(model=model, oripara=post.samples.raw)) 
     }
+  }
+  # construct Desigm Matrix X
+  
+  Xbeta.mean <- xmu
+  Xbeta.sum <- xsum
+  X0 <- NULL
+  X1 <- NULL
+  if(nterm[2L]==5L){
+    X0 <- x0
+    X1 <- x1
+  }
+  else if(nterm[2L]==4L){
+    if(random==0){
+      X0 <- x0
+      X1 <- x1
+    } 
+    else{
+      if(any(one.inflation) & all(!zero.inflation)) X0 <- x0
+      else if(any(zero.inflation) & !all(one.inflation)) X1 <-x1
+    }
+  }
+  else if(nterm[2L]==3L){
+      if(random == 0){
+        if(any(zero.inflation) & !all(one.inflation)) X1 <-  x1
+      }}
+
+  # get predicted value
+  nburn <- n.burn/n.thin
+  ypredcol <-  which(substr(colnames(post.samples.raw[[1]]),1,5)=="ypred")
+  ypred <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),ypredcol]),
+                       mcmc(post.samples.raw[[2]][-(1:nburn),ypredcol]))
+  coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
+                     mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
+  
+  yobs = c(y)
+  return(list(model = model.format, MCMC.model = model, 
+              Xb = Xbeta.mean, Xd = Xbeta.sum, Xb0=X0, Xb1=X1, 
+              coeff = coeff, ypred=ypred, yobs=yobs))
 
 }

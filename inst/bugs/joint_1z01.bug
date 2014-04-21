@@ -44,6 +44,8 @@ model
                   loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j]))
       phi[i,j] <- K-ll[i,j]  
       zero[i,j] ~ dpois(phi[i,j])    
+      
+      ypred[i,j] <-(1-p0[i,j])*p1[i,j] + (1-p0[i,j])*(1-p1[i,j])*mu[i,j]
     }
   }
                                                           
@@ -143,7 +145,7 @@ model
       
   xi ~ dnorm(0.0001,pow(hyper[6],-2)) # half-t 
   eta ~ dgamma(0.5, 0.5)   
-  sigma2 <- abs(xi)*sqrt(eta) 
+  sigma2 <- abs(xi)/sqrt(eta) 
     
   invsigma <- pow(sigma1,-2)*prior2[1,1] + pow(sigma2,-2)*prior2[1,2]
 }

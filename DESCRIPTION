@@ -1,16 +1,16 @@
 Package: zoib
 Type: Package
 Title: Bayesian Inference for Zero/One Inflated Beta Regression
-Version: 1.0
+Version: 1.1
 Date: 2014-04-21
-Author: Fang Liu <fang.liu.131@nd.edu> with contributions YunChuan Kong <s1155014473@cuhk.edu.hk>
+Author: Fang Liu <fang.liu.131@nd.edu> with contributions from Yunchuan Kong <ykong@cuhk.edu.hk>
 Maintainer: Fang Liu <fang.liu.131@nd.edu>
 Depends: R (>= 3.0.2), rjags, coda, matrixcalc, Formula
-Description: zoib fits the zero/one inflated beta regression model and obtains Bayesian Inference of the model via the Markov Chain Monte Carlo approach implemented in JAGS
+Description: zoib fits beta regression and zero or one inflated beta regression and obtains Bayesian Inference of the model via the Markov Chain Monte Carlo approach implemented in JAGS
 URL: http://www.r-project.org, http://www3.nd.edu/~fliu2/
 BugReports: http://www3.nd.edu/~fliu2/
 License: GPL (>= 2)
-Packaged: 2014-06-04 04:02:36 UTC; fliu2
+Packaged: 2015-02-01 20:45:07 UTC; fliu2
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2014-06-04 07:11:37
+Date/Publication: 2015-02-02 01:31:50

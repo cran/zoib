@@ -8,7 +8,7 @@ model
 
     for(j in 1:q)
     {		
-      d0[i,j]<- step(0.002-y[i,j])    #d=1 if y=0
+      d0[i,j]<- step(0.0001-y[i,j])    #d=1 if y=0
 
       # 1: mean
       logit(ph1[i,j,1])  <- inprod(b[,j], xmu.1[i,]) +random[i]*rid[1]
@@ -33,6 +33,9 @@ model
                   loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j]))
       phi[i,j] <- K-ll[i,j]  
       zero[i,j] ~ dpois(phi[i,j])    
+
+      ypred[i,j] <-(1-p0[i,j])*mu[i,j]
+
     }
   }
                                                           
@@ -113,7 +116,7 @@ model
       
   xi ~ dnorm(0.0001,pow(hyper[6],-2)) # half-t 
   eta ~ dgamma(0.5, 0.5)   
-  sigma2 <- abs(xi)*sqrt(eta) 
+  sigma2 <- abs(xi)/sqrt(eta) 
     
   invsigma <- pow(sigma1,-2)*prior2[1,1] + pow(sigma2,-2)*prior2[1,2]
 }
