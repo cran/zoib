@@ -1,0 +1,7 @@
+#useDynLib(zoib)
+import(coda)
+import(rjags)
+import(matrixcalc)
+import(Formula)
+export(check.psrf, zoib)
+

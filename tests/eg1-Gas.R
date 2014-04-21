@@ -1,0 +1,23 @@
+# example 1: GasolineYield
+library(zoib)
+
+data("GasolineYield", package = "zoib")
+
+GasolineYield$batch <- as.factor(GasolineYield$batch)
+
+# zoib: fixed
+eg.fixed <- zoib(yield ~ temp + as.factor(batch)| 1, data=GasolineYield,
+                 joint = FALSE,  random = 0, EUID = 1:nrow(d),
+                 zero.inflation = FALSE, one.inflation = FALSE,
+                 n.iter = 100, n.thin = 5)
+sample1 <- eg.fixed$oripara 
+
+
+# zoib: random
+eg.random <- zoib(yield ~ temp | 1 | 1, data=GasolineYield,
+                  joint = FALSE, random=1, EUID=GasolineYield$batch,
+                  zero.inflation = FALSE, one.inflation = FALSE,
+                  n.iter=100, n.thin=5)
+sample2 <- eg.random$oripara 
+
+

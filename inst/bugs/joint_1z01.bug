@@ -1,0 +1,149 @@
+model
+{
+  K <-1000
+
+  for(i in 1:n)
+  {	   	
+    random[i] <- alpha[EUID[i]]
+
+    for(j in 1:q)
+    {		
+      d0[i,j]<- step(0.0001-y[i,j])    #d=1 if y=0
+      d1[i,j]<- step(y[i,j]-0.9999)    #d=1 if y=1  
+
+      # 1: mean
+      logit(ph1[i,j,1])  <- inprod(b[,j], xmu.1[i,]) +random[i]*rid[1]
+      cloglog(ph1[i,j,2])<- inprod(b[,j], xmu.1[i,]) +random[i]*rid[1]
+      probit(ph1[i,j,3]) <- inprod(b[,j], xmu.1[i,]) +random[i]*rid[1]
+      mu[i,j]<- inprod(ph1[i,j, ],link[1,])
+
+      # 2: sum  
+      log(den[i,j]) <- inprod(d[,j],  xsum.1[i,])+ random[i]*rid[2]
+  
+      s1[i,j]<- den[i,j]*mu[i,j]
+      s2[i,j]<- den[i,j]*(1-mu[i,j])  
+  
+      # 3: zero
+      logit(ph2[i,j,1])  <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]     
+      cloglog(ph2[i,j,2])<- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]   
+      probit(ph2[i,j,3]) <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]   
+      p0[i,j]<- inprod(ph2[i,j, ],link[2,])*inflate0[j]        
+  
+      # 4: one
+      logit(ph3[i,j,1])  <- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])*inflate1[j]
+      cloglog(ph3[i,j,2])<- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])*inflate1[j]
+      probit(ph3[i,j,3]) <- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])*inflate1[j]
+      p1[i,j]<- inprod(ph3[i,j, ],link[3,])*inflate1[j]   
+     
+      ll[i,j]<- d0[i,j]*log(p0[i,j])+
+                (1-d0[i,j])*log(1-p0[i,j])+
+                (1-d0[i,j])*d1[i,j]*log(p1[i,j])+ 
+                (1-d0[i,j])*(1-d1[i,j])*log(1-p1[i,j])+ 
+                (1-d0[i,j])*(1-d1[i,j])*(
+                  (s1[i,j]-1)*log(y[i,j])+(s2[i,j]-1)*log(1-y[i,j])+
+                  loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j]))
+      phi[i,j] <- K-ll[i,j]  
+      zero[i,j] ~ dpois(phi[i,j])    
+    }
+  }
+                                                          
+  for(j in 1:q)
+  {  	
+    b[1,j] ~ dnorm(0, hyper[1])
+    d[1,j] ~ dnorm(0, hyper[1])
+    b1[1,j] <- inflate1*b10[1,j]; b10[1,j]~ dnorm(0, hyper[1])
+    b0[1,j] <- inflate0*b00[1,j]; b00[1,j]~ dnorm(0, hyper[1]) 
+  
+  	for(i in 1:(p.xmu-1))
+  	{
+      ###   diffuse normal ###
+  		b.tmp[i,j,1] ~ dnorm(0.0, hyper[2]) 
+      
+      ###   L1 (larsso) ### 
+  		b.tmp[i,j,2] ~ dnorm(0.0,taub.L1[i,j]);  
+      taub.L1[i,j] <- 1/sigmab.L1[i,j]; 	        
+      sigmab.L1[i,j] ~ dexp(hyper[3]); 
+  		
+      ###   L2  (ridge) ###
+      b.tmp[i,j,3] ~ dnorm(0.0, taub.L2[j]); 
+      
+  		###   ARD  ###
+  		b.tmp[i,j,4] ~ dnorm(0.0,taub.ARD[i,j]);       
+      taub.ARD[i,j] ~ dgamma(hyper[5], hyper[5]); 	      
+      
+      b[i+1,j] <- inprod(b.tmp[i,j, ],prior1[1, ])   	
+   	}
+    taub.L2[j] ~ dgamma(hyper[4],hyper[4]);  # L2 (ridge)
+    
+    	      
+  	for(i in 1:(p.xsum-1))
+  	{
+  		d.tmp[i,j,1] ~ dnorm(0, hyper[2]) 
+      
+  		d.tmp[i,j,2] ~ dnorm(0.0,taud.L1[i,j]);  
+      taud.L1[i,j] <- 1/sigmad.L1[i,j]; 	        
+      sigmad.L1[i,j] ~ dexp(hyper[3]); 
+
+      d.tmp[i,j,3] ~ dnorm(0.0,taud.L2[j]);
+  		
+  		d.tmp[i,j,4] ~ dnorm(0.0,taud.ARD[i,j]);       
+      taud.ARD[i,j] ~ dgamma(hyper[5], hyper[5]); 
+      	          
+      d[i+1,j] <- inprod(d.tmp[i,j, ],prior1[2, ])   	
+   	}
+    taud.L2[j] ~ dgamma(hyper[4],hyper[4]);  
+    
+
+    for(i in 1:(p.x0-1))
+  	{
+  		b0.tmp[i,j,1] ~ dnorm(0, hyper[2]) 
+      
+  		b0.tmp[i,j,2] ~ dnorm(0.0,taub0.L1[i,j]);  
+      taub0.L1[i,j] <- 1/sigmab0.L1[i,j]; 	        
+      sigmab0.L1[i,j] ~ dexp(hyper[3]); 
+      
+      b0.tmp[i,j,3] ~ dnorm(0.0,taub0.L2[j]);
+
+  		b0.tmp[i,j,4] ~ dnorm(0.0,taub0.ARD[i,j]);       
+      taub0.ARD[i,j] ~ dgamma(hyper[5],hyper[5]); 	 
+           
+      b0[i+1,j] <- inprod(b0.tmp[i,j, ],prior1[3, ])*inflate0[j]   	
+   	}
+    taub0.L2[j] ~ dgamma(hyper[4],hyper[4])    
+
+    
+    for(i in 1:(p.x1-1))
+  	{
+  		b1.tmp[i,j,1] ~ dnorm(0, hyper[2]) 
+      
+  		b1.tmp[i,j,2] ~ dnorm(0.0,taub1.L1[i,j]);  
+      taub1.L1[i,j] <- 1/sigmab1.L1[i,j]; 	        
+      sigmab1.L1[i,j] ~ dexp(hyper[3]); 
+
+      b1.tmp[i,j,3] ~ dnorm(0.0,taub1.L2[j]);
+      
+  		b1.tmp[i,j,4] ~ dnorm(0.0,taub1.ARD[i,j]);       
+      taub1.ARD[i,j] ~ dgamma(hyper[5],hyper[5]); 	 
+           
+      b1[i+1,j] <- inprod(b1.tmp[i,j, ],prior1[4, ])*inflate1[j]   	
+   	}
+    taub1.L2[j] ~ dgamma(hyper[4],hyper[4]);  
+    
+  }
+
+  # only the VC structure is available of there is only one random effect
+  # all the levels of that single random effects comes from the same 
+  # univariate normal distribution 
+  
+  for(i in 1:nEU)  { 
+    alpha[i] ~ dnorm(0,invsigma) }
+  sigma <- inverse(invsigma)
+  
+  sigma1 ~ dunif(0, hyper[6]) # uniform 
+      
+  xi ~ dnorm(0.0001,pow(hyper[6],-2)) # half-t 
+  eta ~ dgamma(0.5, 0.5)   
+  sigma2 <- abs(xi)*sqrt(eta) 
+    
+  invsigma <- pow(sigma1,-2)*prior2[1,1] + pow(sigma2,-2)*prior2[1,2]
+}
