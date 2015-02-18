@@ -37,9 +37,9 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
          "taub.L2" = runif(1,0,2), 
          "taud.L2" = runif(1,0,2),
          
-         "sigma1" = runif(1,0,1),
-         "xi" = runif(1,0,1),
-         "eta" = runif(1,0,1))}    
+         "sigma1" = runif(1,0.25,1),
+         "xi" = runif(1,0.25,1),
+         "eta" = runif(1,0.25,1))}    
   inits <- list(init());
   if(n.chain>=2) {for(j in 2:n.chain) inits <- c(inits,list(init( )))}
   op<- system.file("bugs", "sep_1z.bug",package="zoib") 

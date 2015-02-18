@@ -1,10 +1,10 @@
 \name{sep.1z}
 \alias{sep.1z}
 \title{
-Seperately modelling of multiple response variables taking values from (0,1) when there a single random variable in the linear predictors of the link functions
+Separately modelling of multiple response variables taking values from (0,1) when there a single random variable in the linear predictors of the link functions
 }
 \description{
-Internal function to be called by function zoib. Seprately models multiple (0,1)-bounded variables  when there a single random variable in  the linear predictors of the link functions
+Internal function to be called by function zoib. Separately models multiple (0,1)-bounded variables  when there a single random variable in  the linear predictors of the link functions
 }
 \usage{
 sep.1z(y, n, xmu.1, p.xmu, xsum.1, p.xsum, rid, EUID, nEU, prior1, prior2, 

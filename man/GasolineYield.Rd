@@ -5,7 +5,7 @@
 Gasoline Yields Data
 }
 \description{
-Proportion of crude oil converted to gasoline after distillation and fractionation.
+GasolineYield contains proportion of crude oil converted to gasoline after distillation and fractionation.
 }
 
 \usage{data(GasolineYield)}
@@ -20,12 +20,8 @@ Proportion of crude oil converted to gasoline after distillation and fractionati
 The Gasoline Yields Data is a subset of the data GasolineYield in R package "betareg". Refer to the detailed description in R package "betareg".
 }
 
-\references{
-Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, submitted
 
-Liu, F. and Li, Q. (2014) A Bayesian Model for Joint Analysis of Multivariate  Repeated Measures and  Time to Event Data in Crossover Trials, Statistical Methods  in Medical Research, doi: 10.1177/0962280213519594
-
-Cribari-Neto F. and Zeileis A. (2010), Beta Regression in R. Journal of Statistical Software, 34(2):1-24
+\keyword{datasets
 }
 
 \examples{
@@ -38,23 +34,24 @@ Cribari-Neto F. and Zeileis A. (2010), Beta Regression in R. Journal of Statisti
   #  batch as a 10-level qualitative variable
   ################################################
 
-  eg.fixed <- zoib(yield ~ temp + as.factor(batch)| 1, data=GasolineYield,
-                 joint = FALSE,  random = 0, EUID = 1:nrow(d),
-                 zero.inflation = FALSE, one.inflation = FALSE,
-                 n.iter = 1100, n.thin = 5, n.burn=100)
-  # yieds 400 posterior draws (200 per chain) on the parameters of interest
-  
-  # posterior draws of the regression coefficients
-  coeff <- mcmc(eg.fixed$coef)
+  eg.fixed <- zoib(yield ~ temp + as.factor(batch)| 1, 
+              data=GasolineYield, joint = FALSE,  random = 0, 
+              EUID = 1:nrow(d), zero.inflation = FALSE, 
+              one.inflation = FALSE, n.iter = 1100, n.thin = 5, 
+              n.burn=100)
+  # yields 400 posterior draws (200 per chain) on the model parameters
+  coeff <- eg.fixed$coef
+  summary(coeff)
+ 
+  ### check on convergence
 	traceplot(coeff)
-	autocorr.plot(coeff, lag.max=5)
+	autocorr.plot(coeff)
 	check.psrf(coeff)
-	summ1 <- summary(coeff)
-     
-  # Design Matrix: Xb, Xd, Xb0, Xb1
+	   
+  ### Design Matrix: Xb, Xd, Xb0, Xb1
   eg.fixed$Xb; eg.fixed$Xd;  eg.fixed$Xb0; eg.fixed$Xb1  
   
-  # Posterior predictive values of Y
+  # plot posterior mean of y vs. observed y to check on goodness of fit.
   ypred = rbind(eg.fixed$ypred[[1]],eg.fixed$ypred[[2]])
   post.mean= apply(ypred,2,mean); 
   plot(GasolineYield$yield, post.mean, col='blue',pch=2); 
@@ -67,15 +64,15 @@ Cribari-Neto F. and Zeileis A. (2010), Beta Regression in R. Journal of Statisti
                   joint = FALSE, random=1, EUID=GasolineYield$batch,
                   zero.inflation = FALSE, one.inflation = FALSE,
                   n.iter=3200, n.thin=15, n.burn=200)
-
-  # check convergence on the regression coefficients
   sample2 <- eg.random$coeff
+  summary(sample2)
+  
+  # check convergence on the regression coefficients
   traceplot(sample2)
   autocorr.plot(sample2) 
   check.psrf(coeff)
-  summary(mcmc(sample2))
-
-  # predicted y 
+  
+  # plot posterior mean of y vs. observed y to check on goodness of fit.
   ypred = rbind(eg.random$ypred[[1]],eg.random$ypred[[2]])
   post.mean= apply(ypred,2,mean); 
   plot(GasolineYield$yield, post.mean, col='blue',pch=2); 

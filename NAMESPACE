@@ -3,5 +3,5 @@ import(coda)
 import(rjags)
 import(matrixcalc)
 import(Formula)
-export(check.psrf, zoib)
+export(check.psrf, zoib, paraplot)
 

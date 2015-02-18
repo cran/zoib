@@ -70,7 +70,6 @@ model
   taud.L2 ~ dgamma(hyper[4],hyper[4]);  
  
 
-
   for(i in 1:qz){ mu0[i] <- 0 }
   for(i in 1:nEU){ alpha[i,1:qz] ~ dmnorm(mu0,invSigma) }
   invSigma <- inverse(Sigma)

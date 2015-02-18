@@ -2,7 +2,7 @@
 \alias{joint.2z1}
 
 \title{
-Jointly modelling of multiple variables taking values from (0,1] when there are multiple random variables inthe linear predictors of the link functions
+Jointly modelling of multiple variables taking values from (0,1] when there are multiple random variables in the linear predictors of the link functions
 }
 \description{
 Internal function to be called by function zoib. Jointly models multiple (0,1]-bounded variables with inflation at 1 when there are multiple random variables in the linear predictors of the link functions
@@ -59,7 +59,7 @@ lambda.L1, lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chain)
   A vector containing information  on which linear predictors have a random component.
 }
   \item{EUID}{
-	Listing of the the experimental unit ID for each row of the data set.
+	Listing of the experimental unit ID for each row of the data set.
 }
   \item{nEU}{
   Number of experimental units. 

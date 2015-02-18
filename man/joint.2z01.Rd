@@ -2,7 +2,7 @@
 \alias{joint.2z01}
 
 \title{
-Jointly modelling of multiple variables taking values from [0,1] when there are multiple random variables inthe linear predictors of the link functions
+Jointly modelling of multiple variables taking values from [0,1] when there are multiple random variables in the linear predictors of the link functions
 }
 \description{
 Internal function to be called by function zoib. Jointly models multiple [0,1]-bounded variables with inflation at 0 and 1 when there are multiple random variables in the linear predictors of the link functions

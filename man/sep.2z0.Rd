@@ -1,10 +1,10 @@
 \name{sep.2z0}
 \alias{sep.2z0}
 \title{
-Seperately modelling of multiple response variables taking values from [0,1) when there are multiple random variables in the linear predictors of the link functions
+Separately modelling of multiple response variables taking values from [0,1) when there are multiple random variables in the linear predictors of the link functions
 }
 \description{
-Internal function to be called by function zoib; Seprately models multiple [0,1)-bounded variables with inflation at 0 when there multiple random variablesin  the linear predictors of the link functions
+Internal function to be called by function zoib; Separately models multiple [0,1)-bounded variables with inflation at 0 when there are multiple random variables in  the linear predictors of the link functions
 }
 \usage{
 sep.2z0(y, n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, zdummy, qz, nz0, m, rid, 

@@ -54,10 +54,10 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
          "rho2" = rho2,
          "rho3" = rho3,
          
-         "sigma.VC1" = runif(nz0,0,2),
-         "t" = runif(nz0,0,1),
-         "scale1" = runif(qz,0,2),
-         "scale2" = runif(qz,0,2)))}      
+         "sigma.VC1" = runif(nz0,0.25,2),
+         "t" = runif(nz0,0.25,1),
+         "scale1" = runif(qz,0.25,2),
+         "scale2" = runif(qz,0.25,2)))}      
   inits <- list(init());
   if(n.chain>=2) { for(j in 2:n.chain) inits <- c(inits,list(init( )))}
   op<- system.file("bugs", "joint_2z.bug", package="zoib") 

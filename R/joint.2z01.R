@@ -59,10 +59,10 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1, x0.1, p.x0,
          "taub0.L2" = runif(q,0,2),
          "taub1.L2" = runif(q,0,2),
          
-         "sigma.VC1" = runif(nz0,0,2),
-         "t" = runif(nz0,0,1),
-         "scale1" = runif(qz,0,2),
-         "scale2" = runif(qz,0,2),
+         "sigma.VC1" = runif(nz0,0.25,2),
+         "t" = runif(nz0,0.25,1),
+         "scale1" = runif(qz,0.25,2),
+         "scale2" = runif(qz,0.25,2),
          "rho1" = dunif(-0.5,0.5),
          "rho2" = dunif(-0.5,0.5))}    
   inits <- list(init());

@@ -350,24 +350,18 @@ function(
       zdummy <- matrix(0,n,qz)
       
       id <- 0 
-      zdummy[,1]=1
+      zdummy[,1]<- 1
+      
       for(j in 2:nz0)
       {  
         id <- id+m[j-1] 
         if(is.factor(z[,j])|is.character(z[,j])){    
           for(i in 1:nrow(z)){
-            for(k in 1:m[j])
-            {
+            for(k in 1:m[j]){
               if(z[i,j]==zuniq[[j]][k])  {zdummy[i,id+k]<- 1; break}
-            } }}
-        else{ 
-          zdummy[,id+1] <- (z[,j]-mean(z[,j]))/sd(z[,j])}
-      }
-
-      meanz<- apply(as.data.frame(zdummy[,2:qz]),2,mean)
-      sdz  <- apply(as.data.frame(zdummy[,2:qz]),2,sd) 
-      }  
-   
+            }}}
+        else{ zdummy[,id+1] <- z[,j]}}
+    }
     ########################################################
     # 5-12: random, separate modeling
     ########################################################
@@ -633,20 +627,6 @@ function(
               post.samples.raw[[j]][,k] <- tmp[,k]-apply(tmp[,(k+1):(k+p.xsum-1)]*MEAN/SD,1,sum)
               post.samples.raw[[j]][,(k+1):(k+p.xsum-1)] <- tmp[,(k+1):(k+p.xsum-1)]/SD}}
         break}}
-      
-      for(k in 1:dim.para[2]){ 
-        if(grepl("Sigma",name.para[k])){ 
-          L <- matrix(0,qz,qz)
-          L[1,1] <- 1 
-          for(m1 in 2:qz){
-            L[1,m1] <- -meanz[m1-1]/sdz[m1-1]
-            L[m1,m1] <- 1/sdz[m1-1]}
-          for(j in 1:n.chain) { 
-            tmp <- post.samples[[j]]
-            for(m2 in 1:dim.para[1]){ 
-              Sigma<- matrix(tmp[m2,k:(k+qz^2-1)],qz,qz)
-              post.samples.raw[[j]][m2,k:(k+qz^2-1)]<- c(L%*%Sigma%*%t(L))}}
-          break}}
     }
   }
   # construct Desigm Matrix X

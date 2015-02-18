@@ -1,6 +1,5 @@
 check.psrf <-
-function(post1=NULL, post2=NULL, 
-         post3=NULL, post4=NULL, post5=NULL, save=FALSE)
+function(post1=NULL, post2=NULL, post3=NULL, post4=NULL, post5=NULL)
 {
   if(is.list(post1)){
     MCMC.list <- post1
@@ -22,19 +21,7 @@ function(post1=NULL, post2=NULL,
     }
     MCMC.list <- mcmc.list(draw)
   }
-  
-  if(save)
-  {
-    cat("specify the directory the plots and psrf results ")
-    cat("will be saved to ")
-    if(interactive()) readline("using > setwd\n")
-     
-    pdf("psrf.pdf") 
-    gelman.plot(MCMC.list)
-    dev.off()
-  }
-  else  gelman.plot(MCMC.list)
-  
+
   x <- MCMC.list  
   Niter <- niter(x)
   Nchain <- nchain(x)
@@ -45,30 +32,26 @@ function(post1=NULL, post2=NULL,
               dim = c(Nvar, Nvar, Nchain))
   W <- apply(S2, c(1, 2), mean)
   PD <- is.positive.definite(W)    
+  
   if(!PD)
   { 
     psrf.s <- gelman.diag(MCMC.list, multivariate=FALSE)$psrf
     psrf.m <- NULL
     print("the covariance matrix of the posterior samples is not")  
-    print("positive definite, the multivarite psrf cannot be")
+    print("positive definite, and the multivarite psrf cannot be")
     print("computed") 
-    stop
   }
   else{
+    gelman.plot(MCMC.list)
     psrf.s <- gelman.diag(MCMC.list)[[1]]
     psrf.m <- gelman.diag(MCMC.list)[[2]]
   }
-    
-  pdf("psrf_boxplot.pdf",height=4,width=8) 
   par(mfrow=c(1,2),mar=c(2,2,1,1)) 
-  boxplot(psrf.s[,1])
-  mtext("psrf",1,cex=1.2)  
-  boxplot(psrf.s[,2])
-  mtext("upper bounnd of the 95-pecent psrf CI",1,cex=1.2)
-  dev.off()
-  
-  
-  write.table(psrf.s, "psrf.txt", row.names=FALSE)
+  boxplot(psrf.s[,1]); mtext("psrf",1,cex=1.2)  
+  boxplot(psrf.s[,2]); mtext("upper bound of 95% CI",1,cex=1.2)
+ 
+  print(psrf.s); 
+  print(psrf.m)
   return(list(psrf.s=psrf.s, psrf.m=psrf.m,
               psrf.s.summ = apply(psrf.s,2,summary))) 
 }

@@ -42,10 +42,10 @@ lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chain)
    Number of columns in x1.1.
 }
  \item{inflate1}{  
-  A vector ontaining information on which response variables have inflation at 1.
+  A vector containing information on which response variables have inflation at 1.
 }
   \item{rid}{
-  A vector ontaining information on which linear predictor of a random component.
+  A vector containing information on which linear predictor of a random component.
 }
   \item{EUID}{
   Listing of experimental unit ID for each row of the data set.
@@ -94,7 +94,7 @@ lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chain)
 }
 }
 \value{
-  Internal fucntion. Returned values are used internally
+  Internal function. Returned values are used internally
 }
 
 \author{
