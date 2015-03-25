@@ -37,7 +37,7 @@ scale.unif, scale.halft, link, n.chain)
 }
 
   \item{x1.1}{
-  Design matrix associated with the fixed effects in the linear predictor of g(Pr(y=1)), where g() is a link function.
+  Design matrix associated with the fixed effects in the linear predictor of g(Pr(y=1|y>0)), where g() is a link function.
 }
   \item{p.x1}{
    Number of columns in x1.1.

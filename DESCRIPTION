@@ -2,8 +2,8 @@ Package: zoib
 Type: Package
 Title: Bayesian Inference for Beta Regression and Zero/One Inflated
         Beta Regression
-Version: 1.2
-Date: 2015-02-18
+Version: 1.2.1
+Date: 2015-03-25
 Author: Fang Liu <fang.liu.131@nd.edu> with contributions from Yunchuan Kong <ykong@cuhk.edu.hk>
 Maintainer: Fang Liu <fang.liu.131@nd.edu>
 Depends: R (>= 3.0.2), rjags, coda, matrixcalc, Formula
@@ -11,7 +11,7 @@ Description: Fits beta regression and zero/one inflated beta regression and obta
 URL: http://www.r-project.org, http://www3.nd.edu/~fliu2/
 BugReports: fang.liu.131@nd.edu
 License: GPL (>= 2)
-Packaged: 2015-02-18 17:06:26 UTC; fliu2
+Packaged: 2015-03-26 04:13:58 UTC; fliu2
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2015-02-18 19:36:09
+Date/Publication: 2015-03-26 17:20:27

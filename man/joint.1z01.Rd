@@ -35,17 +35,17 @@ prec.DN, lambda.L1, lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chai
   \item{p.xsum}{
    Number of columns in xsum.1.
 }
+  \item{x1.1}{
+   Design matrix associated with the fixed effects in the linear predictor of g(Pr(y=1|y>0)), where g() is a link function.
+}
+  \item{p.x1}{
+   Number of columns in x1.1.
+}
   \item{x0.1}{
    Design matrix associated with the fixed effects in the linear predictor of g(Pr(y=0)), where g() is a link function.
 }
   \item{p.x0}{
    Number of columns in x0.1.
-}
-  \item{x1.1}{
-   Design matrix associated with the fixed effects in the linear predictor of g(Pr(y=1)), where g() is a link function.
-}
-  \item{p.x1}{
-   Number of columns in x1.1.
 }
  \item{inflate0}{  
   Logical vector containing the information on which response variables have inflation at 0.

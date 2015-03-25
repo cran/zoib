@@ -43,7 +43,7 @@ scale.halft = 20, n.chain = 2, n.iter = 5000, n.burn =200, n.thin = 2)
   Link function for Pr(y=0). Choices are "logit" (default), "probit" and "cloglog".
 }
   \item{link.x1}{
-  Link function for Pr(y=1). Choices are "logit" (default), "probit" and "cloglog".
+  Link function for Pr(y=1|y>0). Choices are "logit" (default), "probit" and "cloglog".
 }
   \item{prior.beta}{
   Prior choice for the regression coefficients other than the intercepts in each of the 4 link functions (a vector of dim = 4). Default is rep("DN",4) (DN stands for "diffuse normal"). Refer to "details" for more information.
@@ -91,7 +91,7 @@ scale.halft = 20, n.chain = 2, n.iter = 5000, n.burn =200, n.thin = 2)
 model
 **************
 
-When there are multiple response variables y's, each y should be separated by "|", such as "y1 | y2 | y3"  on the left hand side (LHS) of the formula. On the right side of the formula, it could include up to 5 parts in the following order: 1) fixed-effect variables xb in the link function of the mean of the beta piece; 2) fixed-effect variables  xd in the link function of the sum of the two shape parameters of the beta piece; 3) fixed-effect variables  x0 in the link function of Prob(y=0); 4) fixed-effect variables  x1 in the link function of Prob(y=1); 5) random-effects variables z. xb and xd should always be specified, even if xd contains only an intercept. If there is no zero inflation in any of the y's, then the x0 part can be omitted, similarly with x1 and the random effects part z. For example, if there are 3 response variables and 2 independent variables (xx1, xx2), and none of the y's has zero inflation, then model y1 | y2 | y3 ~ xx1 + xx2 | 1 | xx1 | xx2 implies xb = (1, xx1, xx2), xd = 1 (intercept), x0 = NULL, x1 = xx1, z = (1, xx2). If y1 has 0 inflation, and y3 has 1 inflation, and there is no random effect, model y1 | y2 | y3 ~ xx1 + xx2 | xx1 | xx1 | xx2 implies xb = (1, xx1, xx2), xd = (1, xx1), x0 = xx1, x1 = xx1. Refer to  \code{\link{Formula}} in package \pkg{\link{Formula}} for more details on the specification of terms in formula such as interaction terms, etc.
+When there are multiple response variables y's, each y should be separated by "|", such as "y1 | y2 | y3"  on the left hand side (LHS) of the formula. On the right side of the formula, it could include up to 5 parts in the following order: 1) fixed-effect variables xb in the link function of the mean of the beta piece; 2) fixed-effect variables  xd in the link function of the sum of the two shape parameters of the beta piece; 3) fixed-effect variables  x0 in the link function of Pr(y=0); 4) fixed-effect variables  x1 in the link function of Pr(y=1|y>0); 5) random-effects variables z. xb and xd should always be specified, even if xd contains only an intercept. If there is no zero inflation in any of the y's, then the x0 part can be omitted, similarly with x1 and the random effects part z. For example, if there are 3 response variables and 2 independent variables (xx1, xx2), and none of the y's has zero inflation, then model y1 | y2 | y3 ~ xx1 + xx2 | 1 | xx1 | xx2 implies xb = (1, xx1, xx2), xd = 1 (intercept), x0 = NULL, x1 = xx1, z = (1, xx2). If y1 has 0 inflation, and y3 has 1 inflation, and there is no random effect, model y1 | y2 | y3 ~ xx1 + xx2 | xx1 | xx1 | xx2 implies xb = (1, xx1, xx2), xd = (1, xx1), x0 = xx1, x1 = xx1. Refer to  \code{\link{Formula}} in package \pkg{\link{Formula}} for more details on the specification of terms in formula such as interaction terms, etc.
 
 ***********
 random
@@ -101,7 +101,7 @@ Whether the zoib model has any random components and, if so, which linear predic
 	Eqn 1. g(mu) = xb*beta1, where g is the link function (logit, probit or cloglog), and mu is the mean of the beta piece\cr 
 	Eqn 2. log(eta) = xd*beta2, where eta is the dispersion parameter of the beta piece \cr
 	Eqn 3. g(p0) = x0*beta3, where g is the link function (logit, probit or cloglog), and p0 = Pr(y=0)\cr
-	Eqn 4. g(p1) = x1*beta4, where g is the link function (logit, probit or cloglog), and p1 = Pr(y=1)\cr
+	Eqn 4. g(p1) = x1*beta4, where g is the link function (logit, probit or cloglog), and p1 = Pr(y=1|y>0)\cr
 
 	then random = \cr
   0: no random effect; \cr
@@ -145,7 +145,7 @@ prior.Sigma
 \item{Xb}{design matrix in the link function for modeling the mean of the beta regression}
 \item{Xd}{design matrix in the link function for modeling the sum of the two parameters of the beta regression}
 \item{X0}{design matrix in the link function for modeling Pr(y=0)}
-\item{X1}{design matrix in the link function for modeling Pr(y=1)}
+\item{X1}{design matrix in the link function for modeling Pr(y=1|y>0)}
 \item{ypred}{posterior predictive samples of Y}
 \item{yobs}{observed Y}
 }
