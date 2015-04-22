@@ -22,10 +22,11 @@ model
   
       ll[i,j]<-  (s1[i,j]-1)*log(y[i,j])+(s2[i,j]-1)*log(1-y[i,j])+
                   loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j])
-      phi[i,j] <- K-ll[i,j]	
-      zero[i,j] ~ dpois(phi[i,j])    
+      trick[i,j] <- K-ll[i,j]  
+      zero[i,j] ~ dpois(trick[i,j])    
 
       ypred[i,j] <- mu[i,j]
+      # phi[i,j] <- den[i,j]
     }
   }
                                                           

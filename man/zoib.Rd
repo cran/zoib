@@ -16,7 +16,7 @@ scale.halft = 20, n.chain = 2, n.iter = 5000, n.burn =200, n.thin = 2)
 }
 \arguments{
   \item{model}{
-  Symbolic description of the model in the format of formula, such as y ~ x, y1|y2 ~ x1+x2, or y1 ~ x | z
+  Symbolic description of the model in the format of formula, such as y ~ x, y1 | y2 ~ x1+x2, or y1 ~ x | z
 }
   \item{data}{
   Data to be analyzed; arguments controlling formula processing via model.frame.
@@ -43,7 +43,7 @@ scale.halft = 20, n.chain = 2, n.iter = 5000, n.burn =200, n.thin = 2)
   Link function for Pr(y=0). Choices are "logit" (default), "probit" and "cloglog".
 }
   \item{link.x1}{
-  Link function for Pr(y=1|y>0). Choices are "logit" (default), "probit" and "cloglog".
+  Link function for Pr(y=1 | y>0). Choices are "logit" (default), "probit" and "cloglog".
 }
   \item{prior.beta}{
   Prior choice for the regression coefficients other than the intercepts in each of the 4 link functions (a vector of dim = 4). Default is rep("DN",4) (DN stands for "diffuse normal"). Refer to "details" for more information.
@@ -146,14 +146,16 @@ prior.Sigma
 \item{Xd}{design matrix in the link function for modeling the sum of the two parameters of the beta regression}
 \item{X0}{design matrix in the link function for modeling Pr(y=0)}
 \item{X1}{design matrix in the link function for modeling Pr(y=1|y>0)}
-\item{ypred}{posterior predictive samples of Y}
 \item{yobs}{observed Y}
+\item{ypred}{posterior predictive samples of Y}
+\item{resid}{residual}
+\item{resid.std}{standardized residual}
 }
 
 
 
 \references{
-Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, submitted
+Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, The R Journal (accepted)
 
 Liu, F. and Li, Q. (2014) A Bayesian Model for Joint Analysis of Multivariate  Repeated Measures and Time to Event Data in Crossover Trials, Statistical Methods  in Medical Research, doi: 10.1177/0962280213519594
 

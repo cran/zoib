@@ -12,8 +12,8 @@ beta regression and zero/one inflated beta regression on data where the response
 \tabular{ll}{
 Package: \tab zoib\cr
 Type: \tab Package\cr
-Version: \tab 1.2.1\cr
-Date: \tab 2015-03-25\cr
+Version: \tab 1.3.0\cr
+Date: \tab 2015-04-22\cr
 License: \tab GPL (>= 3)\cr
 }
 }
@@ -33,7 +33,7 @@ Maintainer: Fang Liu (\email{fang.liu.131@nd.edu})
 Liu, F. and Li, Q. (2014). A Bayesian Model for Joint Analysis of Multivariate 
 Repeated Measures and Time to Event Data in Crossover Trials, Statistical Methods in Medical Research, doi: 10.1177/0962280213519594
 
-Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, submitted
+Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, The R Journal (accepted)
 }
 
 \seealso{

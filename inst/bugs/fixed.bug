@@ -18,10 +18,9 @@ model
         	  
       ll[i]<- (s[i,1]-1)*log(y[i])+(s[i,2]-1)*log(1-y[i])+
                   loggam(s[i,1]+s[i,2])-loggam(s[i,1])-loggam(s[i,2])
-      phi[i] <- K-ll[i]
-      zero[i] ~ dpois(phi[i]) 
+      trick[i] <- K-ll[i]
+      zero[i] ~ dpois(trick[i]) 
       ypred[i] <- mu[i]
-
   }
 
   #################      regression coeff   ################## 

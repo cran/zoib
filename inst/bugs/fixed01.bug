@@ -2,9 +2,9 @@ model
 {
   K <-1000
   for(i in 1:n)
-  {	   	     
-      d0[i]<- step(0.0001-y[i])    #d=1 if y=0
-      d1[i]<- step(y[i]-0.9999)    #d=1 if y=1  
+  {	   	      
+      d0[i]<- step(1.0E-40-y[i])        #d0=1 if y=0
+      d1[i]<- step(y[i]-(1-1.0E-40))    #d1=1 if y=1  
     
       # 1: mean
       logit(ph1[i,1])  <- inprod(b[], xmu.1[i,]) 
@@ -30,12 +30,15 @@ model
       probit(ph3[i,3]) <- inprod(b1[], x1.1[i,]) 
       p1[i]<- inprod(ph3[i, ],link[3,])   
         	  
-      ll[i]<- d0[i]*log(p0[i])+(1-d0[i])*log(1-p0[i])+
-               (1-d0[i])*d1[i]*log(p1[i])+(1-d0[i])*(1-d1[i])*log(1-p1[i])+ 
-               (1-d0[i])*(1-d1[i])*((s[i,1]-1)*log(y[i])+(s[i,2]-1)*log(1-y[i])+
+      ll[i]<- d0[i]*log(p0[i])+
+              (1-d0[i])*log(1-p0[i])+
+              (1-d0[i])*d1[i]*log(p1[i])+
+              (1-d0[i])*(1-d1[i])*log(1-p1[i])+ 
+              (1-d0[i])*(1-d1[i])*((s[i,1]-1)*log(y[i])+(s[i,2]-1)*log(1-y[i])+
                   loggam(s[i,1]+s[i,2])-loggam(s[i,1])-loggam(s[i,2]))
-      phi[i] <- K-ll[i]
-      zero[i] ~ dpois(phi[i]) 
+      trick[i] <- K-ll[i]
+      zero[i] ~ dpois(trick[i]) 
+
       ypred[i] <-(1-p0[i])*p1[i] + (1-p0[i])*(1-p1[i])*mu[i]
   }
 

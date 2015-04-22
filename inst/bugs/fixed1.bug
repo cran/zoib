@@ -26,10 +26,10 @@ model
       ll[i]<- d1[i]*log(p1[i])+(1-d1[i])*log(1-p1[i])+ 
               (1-d1[i])*((s[i,1]-1)*log(y[i])+(s[i,2]-1)*log(1-y[i])+
                   loggam(s[i,1]+s[i,2])-loggam(s[i,1])-loggam(s[i,2]))
-      phi[i] <- K-ll[i]
-      zero[i] ~ dpois(phi[i]) 
+      trick[i] <- K-ll[i]
+      zero[i] ~ dpois(trick[i])  
 
-      ypred[i,j] <- p1[i] + (1-p1[i])*mu[i]
+      ypred[i] <- p1[i] + (1-p1[i])*mu[i]
   }
 
   #################      regression coeff   ################## 

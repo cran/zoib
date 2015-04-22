@@ -243,7 +243,7 @@ function(
                             prec.DN,lambda.L1,lambda.L2,lambda.ARD, link, n.chain)   
         para.list <- c("b","d")}
       
-      para.list <- c(para.list,"ypred")    
+      para.list <- c(para.list,"ypred") #"phi"    
       print(para.list)
       post.samples[[i]]<- coda.samples(model[[i]], para.list, n.iter=n.iter, thin=n.thin) 
 
@@ -436,7 +436,7 @@ function(
             para.list <- c("b","d", "sigma")}
         }
         
-        para.list <- c(para.list, "ypred") 
+        para.list <- c(para.list, "ypred") # "phi" 
         print(para.list)
         post.samples[[i]]<- coda.samples(model[[i]], para.list, thin=n.thin, n.iter=n.iter)
         
@@ -577,7 +577,7 @@ function(
                             scale.unif, scale.halft,link, n.chain) 
           para.list <- c("b","d", "sigma")}
       }
-      para.list <- c(para.list, "ypred") 
+      para.list <- c(para.list, "ypred") # "phi" 
       print(para.list)
       post.samples <- coda.samples(model, para.list, thin=n.thin, n.iter=n.iter)
 
@@ -654,17 +654,35 @@ function(
         if(any(zero.inflation) & !all(one.inflation)) X1 <-  x1
       }}
 
-  # get predicted value
   nburn <- n.burn/n.thin
   ypredcol <-  which(substr(colnames(post.samples.raw[[1]]),1,5)=="ypred")
-  ypred <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),ypredcol]),
-                       mcmc(post.samples.raw[[2]][-(1:nburn),ypredcol]))
+  #phicol <-  which(substr(colnames(post.samples.raw[[1]]),1,3)=="phi")
+  #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(phicol[1]-1)]),
+  #                   mcmc(post.samples.raw[[2]][-(1:nburn),1:(phicol[1]-1)]))
   coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
                      mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
-  
-  yobs = c(y)
-  return(list(model = model.format, MCMC.model = model, 
-              Xb = Xbeta.mean, Xd = Xbeta.sum, Xb0=X0, Xb1=X1, 
-              coeff = coeff, ypred=ypred, yobs=yobs))
+                     
+  # get predicted value
+  pred1 <- post.samples.raw[[1]][-(1:nburn),ypredcol]
+  pred2 <- post.samples.raw[[2]][-(1:nburn),ypredcol] 
+  ypred <- mcmc.list(mcmc(pred1), mcmc(pred2))
 
+  # residuals
+  yobs <- c(y); 
+  howmany <- length(yobs)
+  names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
+  resid1 <- yobs-pred1; colnames(resid1)<- names
+  resid2 <- yobs-pred2; colnames(resid2)<- names
+  resid <- mcmc.list(mcmc(resid1), mcmc(resid2))
+  
+  # standardized residuals
+  names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
+  resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
+  resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
+  resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
+  
+  return(list(model= model.format, MCMC.model= model, 
+              Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= X0, Xb1=X1, 
+              coeff= coeff, ypred= ypred, yobs= yobs, 
+              resid= resid, resid.std= resid.std))
 }
