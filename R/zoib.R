@@ -2,10 +2,11 @@ zoib <-
 function( 
   model, 
   data,
+  n.response = 1,
   zero.inflation = TRUE,
   one.inflation = TRUE,
 
-  joint = TRUE, 
+  joint = TRUE,
   random = 0,
   EUID,
   
@@ -13,24 +14,39 @@ function(
   link.x0="logit", 
   link.x1="logit",    
 
-  prior.beta = rep("DN",4),  
-  prec.int   = 1e-3,
-  prec.DN    = 1e-3,
-  lambda.L2  = 1e-3,
-  lambda.L1  = 1e-3,
-  lambda.ARD = 1e-3,
+  prec.int   = matrix(1e-3, n.response, 4),
+  prior.beta = matrix("DN", n.response, 4),  
+  prec.DN    = matrix(1e-3, n.response, 4),
+  lambda.L2  = matrix(1e-3, n.response, 4),
+  lambda.L1  = matrix(1e-3, n.response, 4),
+  lambda.ARD = matrix(1e-3, n.response, 4),
     
-  prior.Sigma = "VC.halft", 
+  prior.Sigma = "VC.unif", 
   scale.unif = 20, 
-  scale.halft = 20,
+  scale.halfcauchy = 20,
   
   n.chain = 2,
   n.iter = 5000, 
   n.burn = 200,
-  n.thin = 2
+  n.thin = 2,
+   
+  inits = NULL
 )
                     
 { 
+  if(!is.matrix(prec.int)) 
+    stop("prec.int should be in the format of a matrix, even it has only one row")
+  if(!is.matrix(prior.beta)) 
+    stop("prior.beta should be in the format of a matrix, even it has only one row")
+  if(!is.matrix(prec.DN)) 
+    stop("prec.DN should be in the format of a matrix, even it has only one row")
+  if(!is.matrix(lambda.L2)) 
+    stop("lambda.L2 should be in the format of a matrix, even it has only one row")
+  if(!is.matrix(lambda.L1)) 
+    stop("lambda.L1 should be in the format of a matrix, even it has only one row")
+  if(!is.matrix(lambda.ARD)) 
+    stop("lambda.ARD should be in the format of a matrix, even it has only one row")
+  
   # the model equation for output, ow, the jags model would be by default
   model.format <- model
   
@@ -129,6 +145,12 @@ function(
       xsum <- as.matrix(rep(1,nrow(xsum)))
   }
 
+  
+  if(is.null(ncol(y))) y<-as.matrix(y,ncol=1)
+  n <- nrow(y)
+  q <- ncol(y)
+  
+  
   # link choice
   link <- matrix(0,3,3)
   
@@ -144,20 +166,22 @@ function(
   else if(link.x1=="cloglog") link[3,2]<- 1
   else if(link.x1=="probit") link[3,3]<- 1
 
-  # prior.beta choice
-  prior1 <- matrix(0,4,4)
-  for(i in 1:4){ 
-    if(prior.beta[i]=="DN" | prior.beta[i]=="D")     prior1[i,1]<-1
-    else if(prior.beta[i]=="L1")                     prior1[i,2]<-1
-    else if(prior.beta[i]=="L2")                     prior1[i,3]<-1
-    else if(prior.beta[i]=="ARD"|prior.beta[i]=="A") prior1[i,4]<-1
+  # prior.beta choice; 4 link funtions (rows), each with 4 choices (columns).
+  prior1 <- array(0,c(4,4,q))
+  for(j in 1:q){
+    for(i in 1:4){ 
+      if(prior.beta[j,i]=="DN" | prior.beta[j,i]=="D")     prior1[i,1,j]<-1
+      else if(prior.beta[j,i]=="L1")                       prior1[i,2,j]<-1
+      else if(prior.beta[j,i]=="L2")                       prior1[i,3,j]<-1
+      else if(prior.beta[j,i]=="ARD"|prior.beta[j,i]=="A") prior1[i,4,j]<-1
+    }
   }
   # prior.Sigma choice 
   prior2 <- matrix(0,2,2)
   if(prior.Sigma==c("VC.unif"))       prior2[1,1]<-1
-  else if(prior.Sigma==c("VC.halft")) prior2[1,2]<-1
+  else if(prior.Sigma==c("VC.halfcauchy")) prior2[1,2]<-1
   else if(prior.Sigma==c("UN.unif"))  prior2[2,1]<-1
-  else if(prior.Sigma==c("UN.halft")) prior2[2,2]<-1
+  else if(prior.Sigma==c("UN.halfcauchy")) prior2[2,2]<-1
   
   
   # random effect choice
@@ -166,11 +190,7 @@ function(
   if(any(random==c(2,12,23,24,123,124,234,1234))) rid[2]<-1
   if(any(random==c(3,13,23,34,123,134,234,1234))) rid[3]<-1
   if(any(random==c(4,14,24,34,124,134,234,1234))) rid[4]<-1  
-   
-  if(is.null(ncol(y))) y<-as.matrix(y,ncol=1)
-  n <- nrow(y)
-  q <- ncol(y)
-  
+
  
   # x-mu
   xmu.1 <- xmu;  p.xmu <- ncol(xmu.1)  
@@ -228,19 +248,23 @@ function(
     {
       if(one.inflation[i] & zero.inflation[i] ){
         model[[i]]<- fixed01(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, x1.1, p.x1,
-                             prior1, prec.int, prec.DN,lambda.L1,lambda.L2,lambda.ARD,link,n.chain)                           
+                             prior1[,,i], prec.int[i,], prec.DN[i,],lambda.L1[i,],lambda.L2[i,],
+                             lambda.ARD[i,],link,n.chain, inits)                           
         para.list <- c("b","d","b0","b1")}
       else if(zero.inflation[i]  & !one.inflation[i] ){      
-        model[[i]]<- fixed0(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, prior1, 
-                            prec.int, prec.DN,lambda.L1,lambda.L2,lambda.ARD,link, n.chain)   
+        model[[i]]<- fixed0(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, prior1[,,i], 
+                            prec.int[i,], prec.DN[i,], lambda.L1[i,], lambda.L2[i,],
+                            lambda.ARD[i,],link, n.chain, inits)   
         para.list <- c("b","d","b0")}
       else if(one.inflation[i] & !zero.inflation[i] ){ 
-        model[[i]]<- fixed1(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,prior1,
-                            prec.int, prec.DN,lambda.L1,lambda.L2,lambda.ARD, link, n.chain) 
+        model[[i]]<- fixed1(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,prior1[,,i],
+                            prec.int[i,], prec.DN[i,],lambda.L1[i,],lambda.L2[i,],
+                            lambda.ARD[i,],link, n.chain, inits) 
         para.list <- c("b","d","b1")}
       else if(!one.inflation[i] & !zero.inflation[i] ){ 
-        model[[i]]<-  fixed(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, prior1,prec.int, 
-                            prec.DN,lambda.L1,lambda.L2,lambda.ARD, link, n.chain)   
+        model[[i]]<-  fixed(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, prior1[,,i],
+                            prec.int[i,], prec.DN[i,],lambda.L1[i,],lambda.L2[i,],
+                            lambda.ARD[i,], link, n.chain, inits)   
         para.list <- c("b","d")}
       
       para.list <- c(para.list,"ypred") #"phi"    
@@ -384,27 +408,30 @@ function(
         if(nz0>1){ 
           if(one.inflation[i] & zero.inflation[i]){ 
             model[[i]]<- sep.2z01(y[,i],n, xmu.1, p.xmu, xsum.1,p.xsum, x0.1,p.x0, x1.1,p.x1, 
-                                  zdummy,qz,nz0,m, rid,  nEU, prior1, prior2, prior.beta, 
-                                  prior.Sigma, prec.int, prior1, prec.DN, lambda.L1, lambda.L2, 
-                                  lambda.ARD, scale.unif, scale.halft,link, n.chain) 
+                                  zdummy,qz,nz0,m, rid,  nEU, prior1[,,i], prior2, prior.beta, 
+                                  prior.Sigma, prec.int[i,], prec.DN[i,], lambda.L1[i,],
+                                  lambda.L2[i,],lambda.ARD[i,], scale.unif, scale.halfcauchy,link, 
+                                  n.chain, inits) 
             para.list <- c("b","d","b0","b1","Sigma")}
           else if(!one.inflation[i] & zero.inflation[i]){ 
             model[[i]]<- sep.2z0(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, zdummy, 
-                                 qz,nz0, m, rid,  nEU, prior1, prior2, prior.beta, prior.Sigma,
-                                 prec.int, prior1, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                                 scale.unif, scale.halft,link, n.chain)
+                                 qz,nz0, m, rid,  nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
+                                 prec.int[i,], prec.DN[i,], lambda.L1[i,],
+                                 lambda.L2[i,],lambda.ARD[i,],scale.unif, scale.halfcauchy,link, 
+                                 n.chain, inits)
             para.list <- c("b","d", "b0","Sigma")}
           else  if(one.inflation[i] & !zero.inflation[i]){ 
             model[[i]]<- sep.2z1(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1, zdummy, 
-                                 qz,nz0, m, rid, EUID1, nEU, prior1, prior2, prior.beta, 
-                                 prior.Sigma, prec.int, prec.DN, lambda.L1, lambda.L2, 
-                                 lambda.ARD, scale.unif, scale.halft,link, n.chain)
+                                 qz,nz0, m, rid, EUID1, nEU, prior1[,,i], prior2, prior.beta, 
+                                 prior.Sigma,  prec.int[i,], prec.DN[i,], lambda.L1[i,],
+                                 lambda.L2[i,],lambda.ARD[i,],scale.unif, scale.halfcauchy,link, 
+                                 n.chain, inits)
             para.list <- c("b","d", "b1","Sigma")}
           else if(!one.inflation[i] & !zero.inflation[i]){ 
             model[[i]]<- sep.2z(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, zdummy, qz,nz0, m,
-                                rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma, 
-                                prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                                scale.unif, scale.halft,link, n.chain) 
+                                rid, EUID1, nEU, prior1[,,i], prior2, prior.beta, prior.Sigma, 
+                                prec.int[i,], prec.DN[i,], lambda.L1[i,],lambda.L2[i,],
+                                lambda.ARD[i,],scale.unif, scale.halfcauchy,link, n.chain, inits)
             para.list <- c("b","d", "Sigma")}
 
         }
@@ -412,27 +439,27 @@ function(
         { 
           if(one.inflation[i] & zero.inflation[i]){ 
             model[[i]]<- sep.1z01(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, x1.1, p.x1, 
-                                  rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
-                                  prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                                  scale.unif, scale.halft, link, n.chain) 
+                                  rid, EUID1, nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
+                                  prec.int[i,], prec.DN[i,], lambda.L1[i,],lambda.L2[i,],
+                                  lambda.ARD[i,],scale.unif, scale.halfcauchy,link, n.chain, inits) 
             para.list <- c("b","d", "b0","b1","sigma") }
           else if(one.inflation[i] & !zero.inflation[i]){ 
             model[[i]]<- sep.1z1(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
-                                 rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
-                                 prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                                 scale.unif, scale.halft, link, n.chain) 
+                                 rid, EUID1, nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
+                                 prec.int[i,], prec.DN[i,], lambda.L1[i,],lambda.L2[i,],
+                                 lambda.ARD[i,],scale.unif, scale.halfcauchy,link, n.chain, inits) 
             para.list <- c("b","d", "b1","sigma")  }
           else if(!one.inflation[i] & zero.inflation[i]){
             model[[i]]<- sep.1z0(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
-                                 rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
-                                 prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                                 scale.unif, scale.halft, link, n.chain) 
+                                 rid, EUID1, nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
+                                 prec.int[i,], prec.DN[i,], lambda.L1[i,],lambda.L2[i,],
+                                 lambda.ARD[i,],scale.unif, scale.halfcauchy,link, n.chain, inits) 
             para.list <- c("b","d", "b0","sigma")}
           else if(!one.inflation[i] & !zero.inflation[i]) { 
             model[[i]]<- sep.1z(y[,i], n, xmu.1, p.xmu, xsum.1, p.xsum, rid,EUID1,
-                                nEU, prior1, prior2, prior.beta, prior.Sigma,
-                                prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,  
-                                scale.unif, scale.halft, link, n.chain)
+                                nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
+                                prec.int[i,], prec.DN[i,], lambda.L1[i,],lambda.L2[i,],
+                                lambda.ARD[i,],scale.unif, scale.halfcauchy,link, n.chain, inits)
             para.list <- c("b","d", "sigma")}
         }
         
@@ -506,8 +533,8 @@ function(
           model<-  joint.2z01(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, x1.1, p.x1,
                               inflate0, inflate1, zdummy, qz,nz0,m, rid, EUID1, nEU, 
                               prior1, prior2, prior.beta, prior.Sigma, prec.int, prec.DN, 
-                              lambda.L1, lambda.L2, lambda.ARD, scale.unif, scale.halft,
-                              link, n.chain)
+                              lambda.L1, lambda.L2, lambda.ARD, scale.unif, scale.halfcauchy,
+                              link, n.chain, inits)
           para.list <- c("b","d", "b0","b1","Sigma")}
         else if(all(!one.inflation) & any(zero.inflation)){
           inflate0 <- rep(1,q)
@@ -517,7 +544,7 @@ function(
                             zdummy, qz,nz0,m,rid, EUID1, nEU, 
                             prior1, prior2, prior.beta, prior.Sigma,
                             prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                            scale.unif, scale.halft,link, n.chain) 
+                            scale.unif, scale.halfcauchy,link, n.chain, inits) 
           para.list <- c("b","d", "b0","Sigma")}
         else if(any(one.inflation) & all(!zero.inflation)) { 
           inflate1 <- rep(0,q)
@@ -527,13 +554,13 @@ function(
                             zdummy,qz,nz0,m,rid, EUID1, nEU,
                             prior1, prior2, prior.beta, prior.Sigma,
                             prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                            scale.unif, scale.halft,link, n.chain) 
+                            scale.unif, scale.halfcauchy,link, n.chain, inits) 
           para.list <- c("b","d","b1","Sigma")}
         else if(all(!one.inflation) & all(!zero.inflation)){ 
           model<- joint.2z(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum,zdummy,qz,nz0,m,
                             rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
                             prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                            scale.unif, scale.halft,link, n.chain)
+                            scale.unif, scale.halfcauchy,link, n.chain, inits)
           para.list <- c("b","d","Sigma")}
       }
       else 
@@ -548,7 +575,7 @@ function(
           model<- joint.1z01(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, x1.1, p.x1, 
                              inflate0, inflate1, rid, EUID1, nEU, prior1, prior2, 
                              prior.beta, prior.Sigma,prec.int, prec.DN, lambda.L1,lambda.L2, 
-                             lambda.ARD, scale.unif, scale.halft,link, n.chain)
+                             lambda.ARD, scale.unif, scale.halfcauchy,link, n.chain, inits)
           para.list <- c("b","d", "b0","b1","sigma")}
         else if(all(!one.inflation) & any(zero.inflation)) { 
           inflate0 <- rep(1,q)
@@ -558,7 +585,7 @@ function(
           model<- joint.1z0(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, inflate0,
                             rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
                             prec.int,prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                            scale.unif, scale.halft,link, n.chain) 
+                            scale.unif, scale.halfcauchy,link, n.chain, inits) 
           para.list <- c("b","d", "b0","sigma")}
         else  if(any(one.inflation) & all(!zero.inflation)){ 
           inflate1 <- rep(0,q)
@@ -568,13 +595,13 @@ function(
           model<- joint.1z1(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum,x1.1, p.x1,inflate1,
                             rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
                             prec.int, prec.DN,lambda.L1, lambda.L2, lambda.ARD,
-                            scale.unif, scale.halft,link, n.chain) 
+                            scale.unif, scale.halfcauchy,link, n.chain, inits) 
           para.list <- c("b","d","b1","sigma")}
         else if(all(!one.inflation) & all(!zero.inflation)) { 
           model<- joint.1z(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum, 
                             rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
                             prec.int, prec.DN,lambda.L1, lambda.L2, lambda.ARD, 
-                            scale.unif, scale.halft,link, n.chain) 
+                            scale.unif, scale.halfcauchy,link, n.chain, inits) 
           para.list <- c("b","d", "sigma")}
       }
       para.list <- c(para.list, "ypred") # "phi" 

@@ -11,7 +11,7 @@ Internal function to be called by function zoib. Jointly models multiple [0,1]-b
 joint.2z01(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1, x0.1, p.x0, 
 inflate0, inflate1, zdummy, qz, nz0, m, rid, EUID, nEU, prior1, prior2, 
 prior.beta, prior.Sigma, prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD, 
-scale.unif, scale.halft, link, n.chain)
+scale.unif, scale.halft, link, n.chain,inits)
 }
 \arguments{
   \item{y}{
@@ -113,6 +113,9 @@ scale.unif, scale.halft, link, n.chain)
 }
   \item{n.chain}{
    Number of chains for the MCMC sampling.
+}
+  \item{inits}{
+  initial parameter for model parameters.
 }
 }
 \value{

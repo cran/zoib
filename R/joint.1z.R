@@ -1,12 +1,13 @@
 joint.1z <-
 function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,  
-                     rid, EUID, nEU, prior1, prior2, prior.beta, prior.Sigma, 
-                     prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
-                     scale.unif, scale.halft, link, n.chain) 
+        rid, EUID, nEU, prior1, prior2, prior.beta, prior.Sigma, 
+        prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD,
+        scale.unif, scale.halft, link, n.chain, inits) 
 { 
-  dataIn <- vector("list",15)
+  dataIn <- vector("list",16)
   names(dataIn)<- c("n","y","q","xmu.1","p.xmu","xsum.1","p.xsum",
-                    "zero","link", "hyper", "prior1","prior2","rid","EUID","nEU")
+                    "zero","link", "hyper", "prior1","prior2","rid","EUID",
+                    "nEU","hyper2")
   dataIn[[1]] <- n      
   dataIn[[2]] <- as.matrix(y)
   dataIn[[3]] <- q
@@ -16,9 +17,9 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
   dataIn[[7]] <- p.xsum  
   dataIn[[8]] <- matrix(0,n,q)  
   dataIn[[9]] <- link 
-  dataIn[[10]]<- c(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD)  
-  if(grepl("unif", prior.Sigma)) dataIn[[10]] <- c(dataIn[[10]],scale.unif)
-  if(grepl("halft",prior.Sigma)) dataIn[[10]] <- c(dataIn[[10]],scale.halft)                    
+  dataIn[[10]]<- abind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD,along=3)
+  if(grepl("unif", prior.Sigma)) dataIn[[16]] <- scale.unif
+  if(grepl("halfcauchy",prior.Sigma)) dataIn[[16]] <- scale.halft                   
   dataIn[[11]] <- prior1
   dataIn[[12]] <- prior2    
   dataIn[[13]] <- rid 
@@ -26,7 +27,10 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
   dataIn[[15]] <- nEU
 
   init <- function( ){
-    list("b.tmp" = array(rnorm((p.xmu-1)*4*q,0,0.1),  c((p.xmu-1),q,4)),
+    list("tmp1" = rnorm(q,0,0.1),
+         "tmp2" = rnorm(q,0,0.1),
+         
+         "b.tmp" = array(rnorm((p.xmu-1)*4*q,0,0.1),  c((p.xmu-1),q,4)),
          "d.tmp" = array(rnorm((p.xsum-1)*4*q,0,0.1), c((p.xsum-1),q,4)),
          
          "sigmab.L1" =  matrix(runif((p.xmu-1)*q,0,2), (p.xmu-1),q), 
@@ -39,11 +43,29 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
          "taud.L2" =  runif(q,0,2),
          
          "sigma1" = runif(1,0.25,1),
-         "xi" = runif(1,0.25,1),
-         "eta" = runif(1,0.25,1))}    
-  inits <- list(init());
-  if(n.chain>=2) {for(j in 2:n.chain) inits <- c(inits,list(init( )))} 
+         "scale2" = runif(1,0.25,1))}    
+  
+  inits.internal <- list(init( ));
+  if(n.chain >= 2) {
+    for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init( ))) }   
+  
+  if(!is.null(inits)){
+    
+  for(i in 1:n.chain){
+    
+    if(!is.null(inits[[i]]$b)) {
+      inits.internal[[i]][[1]] <- inits[[i]]$b[1]
+      inits.internal[[i]][[3]] <- matrix(rep(inits[[i]]$b[2:p.xmu],4), 
+                                         ncol=4, byrow=FALSE)}
+    if(!is.null(inits[[i]]$d)) {
+      inits.internal[[i]][[2]] <- inits[[i]]$d[1]
+      inits.internal[[i]][[4]] <- matrix(rep(inits[[i]]$d[2:p.xsum],4), 
+                                         ncol=4, byrow=FALSE)}    
+    if(!is.null(inits[[i]]$sigma)) {
+      inits.internal[[i]][[11]]<- inits[[i]]$sigma
+      inits.internal[[i]][[12]]<- inits[[i]]$sigma}
+  }}
   op<- system.file("bugs", "joint_1z.bug", package="zoib") 
-  model <- jags.model(op,data=dataIn,n.adapt=0, inits=inits, n.chains=n.chain)   
+  model <- jags.model(op,data=dataIn,n.adapt=0, inits=inits.internal, n.chains=n.chain)   
   return(model)
 }

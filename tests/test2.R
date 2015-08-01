@@ -2,7 +2,7 @@
 library(zoib)
 
 data("BiRepeated", package = "zoib")
-eg2 <- zoib(y1|y2 ~ x|1|x, data= BiRepeated,
+eg2 <- zoib(y1|y2 ~ x|1|x, data= BiRepeated, n.response=2,
             random=1, EUID= BiRepeated$id,
             zero.inflation = FALSE, one.inflation = FALSE,				
             prior.Sigma = "VC.unif", n.iter=5, n.thin=1, n.burn=1)

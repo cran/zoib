@@ -9,7 +9,7 @@ Internal function to be called by function zoib; Fits a fixed-effects beta regre
 }
 \usage{
 fixed(y, n, xmu.1, p.xmu, xsum.1, p.xsum, prior1, prec.int, prec.DN, lambda.L1,
-lambda.L2, lambda.ARD, link, n.chain)
+lambda.L2, lambda.ARD, link, n.chain,inits)
 }
 \arguments{
   \item{y}{
@@ -53,6 +53,9 @@ lambda.L2, lambda.ARD, link, n.chain)
 }
   \item{n.chain}{
    Number of chains for the MCMC sampling.
+}
+  \item{inits}{
+  initial parameter for model parameters.
 }
 }
 

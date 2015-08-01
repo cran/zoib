@@ -3,12 +3,12 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
                    zdummy, qz,nz0, m, rid, EUID, nEU,
                    prior1, prior2, prior.beta, prior.Sigma, 
                    prec.int, prec.DN, lambda.L1, lambda.L2,lambda.ARD,
-                   scale.unif, scale.halft, link, n.chain) 
+                   scale.unif, scale.halft, link, n.chain, inits) 
 {
-  dataIn <- vector("list",19)
-  names(dataIn) <- c("n","y","xmu.1","p.xmu","xsum.1","p.xsum",
-                     "z","nz0","qz","m","cumm", "zero","link",
-                     "prior1","prior2","hyper","rid","EUID","nEU")
+  dataIn <- vector("list",20)
+  names(dataIn) <- c("n","y","xmu.1","p.xmu","xsum.1","p.xsum","z",
+                     "nz0","qz","m","cumm", "zero","link","prior1",
+                     "prior2","hyper","rid","EUID","nEU","hyper2")
   dataIn[[1]] <- n      
   dataIn[[2]] <- y
   dataIn[[3]] <- as.matrix(xmu.1)
@@ -24,20 +24,23 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
   dataIn[[13]]<- link
   dataIn[[14]] <- prior1
   dataIn[[15]] <- prior2 
-  dataIn[[16]] <- c(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD)          
-  if(grepl("unif",prior.Sigma))  dataIn[[16]] <- c(dataIn[[16]],scale.unif)
-  if(grepl("halft",prior.Sigma)) dataIn[[16]] <- c(dataIn[[16]],scale.halft)   
+  dataIn[[16]] <- as.matrix(cbind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD))          
+  if(grepl("unif",prior.Sigma))  dataIn[[20]] <- scale.unif
+  if(grepl("halfcauchy",prior.Sigma)) dataIn[[20]] <- scale.halft   
   dataIn[[17]] <- rid
   dataIn[[18]] <- EUID 
   dataIn[[19]] <- nEU
 
   init <- function( ){
-    rho1 <- runif(1,0,0.999)
-    rho2 <- runif(1,0,0.999) 
+    rho1 <- runif(1,-0.5,0.5)
+    rho2 <- runif(1,-0.5,0.5) 
     rho3 <- runif(1, rho1*rho2 - sqrt((1-rho1^2)*(1-rho2^2)), 
                   rho1*rho2 + sqrt((1-rho1^2)*(1-rho2^2)))
     return(
-    list("b.tmp" = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
+    list("tmp1" = rnorm(1,0,0.1),
+         "tmp2" = rnorm(1,0,0.1),
+         
+         "b.tmp" = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
          "d.tmp" = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
          
          "sigmab.L1" = runif((p.xmu-1),0,2), 
@@ -49,18 +52,68 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
          "taub.L2" = runif(1,0,2), 
          "taud.L2" = runif(1,0,2),
          
+         "sigma.VC1" = runif(nz0,0.25,2),
+         "t" = runif(nz0,0.25,1),       
+         "scale1" = runif(qz,0.25,2),
+         "scale2" = runif(qz,0.25,2),
+         
          "rho1" = rho1,
          "rho2" = rho2,
-         "rho3" = rho3,
-         
-         "sigma.VC1" = runif(nz0,0.25,2),
-         "t" = runif(nz0,0.25,1),         
-         "scale1" = runif(qz,0.25,2),
-         "scale2" = runif(qz,0.25,2)))}    
-  inits <- list(init());
-  if(n.chain>=2) { for(j in 2:n.chain) inits <- c(inits,list(init( )))}
+         "rho3" = rho3))}    
   
+  # 1b, 2d, 
+  # 3 SigmaVC (sigma.VC1 or t),SigmaUN (scale1 or scale2),
+  # 4 rho1,2,3
+  inits.internal <- list(init( ));
+  if(n.chain >= 2) {
+    for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init( ))) }   
+  
+  if(!is.null(inits)){
+    
+  for(i in 1:n.chain){
+    
+    if(!is.null(inits[[i]]$b)) {
+      inits.internal[[i]][[1]] <- inits[[i]]$b[1]
+      inits.internal[[i]][[3]] <- matrix(rep(inits[[i]]$b[2:p.xmu],4), 
+                                         ncol=4, byrow=FALSE)}
+    if(!is.null(inits[[i]]$d)) {
+      inits.internal[[i]][[2]] <- inits[[i]]$d[1]
+      inits.internal[[i]][[4]] <- matrix(rep(inits[[i]]$d[2:p.xsum],4), 
+                                         ncol=4, byrow=FALSE)}
+    
+    if(!is.null(inits[[i]]$sigma)) {
+      inits.internal[[i]][[11]]<- inits[[i]]$sigma
+      inits.internal[[i]][[12]]<- inits[[i]]$sigma
+      inits.internal[[i]][[13]]<- inits[[i]]$sigma
+      inits.internal[[i]][[14]]<- inits[[i]]$sigma
+    }
+    
+    # check PD of the initial R matrix
+    if(!is.null(inits[[i]]$R)) {
+      notuse <-FALSE
+      Rele <- inits[[i]]$R
+      size <- length(Rele)
+      R <- diag(size)
+      R[upper.tri(R, diag=TRUE)] <- Rele 
+      R <- R + t(R) - diag(diag(R))
+      pd <- (eigen(R)$values>0)
+      if(!pd) {
+        notuse <- TRUE
+        warning('the specified initial correlation matrix is not positive definite')
+        warning('Internal initial value are used')
+        break}
+      else{
+        if(size==1) inits.internal[[i]][[15]] <-inits[[i]]$R
+        if(size==2){
+          inits.internal[[i]][[15]] <-inits[[i]]$R[1]; 
+          inits.internal[[i]][[16]] <-inits[[i]]$R[2]}
+        if(size==3){
+          inits.internal[[i]][[15]] <-inits[[i]]$R[1]; 
+          inits.internal[[i]][[16]] <-inits[[i]]$R[2]; 
+          inits.internal[[i]][[17]] <-inits[[i]]$R[3]}}
+    }
+  }}
   op<- system.file("bugs", "sep_2z.bug", package="zoib") 
-  model <- jags.model(op, data=dataIn,n.adapt=0, inits=inits, n.chains=n.chain)  
+  model <- jags.model(op, data=dataIn,n.adapt=0, inits=inits.internal, n.chains=n.chain)  
   return(model)
 }

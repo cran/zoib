@@ -9,7 +9,7 @@ Internal function to be called by function zoib. Separately models multiple (0,1
 \usage{
 sep.1z(y, n, xmu.1, p.xmu, xsum.1, p.xsum, rid, EUID, nEU, prior1, prior2, 
 prior.beta, prior.Sigma, prec.int, prec.DN, lambda.L1, lambda.L2, lambda.ARD, 
-scale.unif, scale.halft, link, n.chain)
+scale.unif, scale.halft, link, n.chain,inits)
 }
 \arguments{
   \item{y}{
@@ -78,6 +78,9 @@ scale.unif, scale.halft, link, n.chain)
 }
   \item{n.chain}{
   Number of chains for the MCMC sampling.
+}
+  \item{inits}{
+  initial parameter for model parameters.
 }
 }
 
