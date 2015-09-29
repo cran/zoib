@@ -27,13 +27,13 @@ function(y, n, xmu.1,p.xmu, xsum.1,p.xsum, x0.1,p.x0, x1.1,p.x1,
   dataIn[[16]]<- rep(0,n)
   dataIn[[17]]<- link
   dataIn[[18]] <- as.matrix(cbind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD))        
-  if(grepl("unif",prior.Sigma))  dataIn[[24]] <- scale.unif
-  if(grepl("halfcauchy",prior.Sigma)) dataIn[[24]] <- scale.halft                
   dataIn[[19]] <- prior1
   dataIn[[20]] <- prior2 
   dataIn[[21]] <- rid
   dataIn[[22]] <- EUID
   dataIn[[23]] <- nEU
+  if(grepl("unif",prior.Sigma))  dataIn[[24]] <- scale.unif
+  if(grepl("halfcauchy",prior.Sigma)) dataIn[[24]] <- scale.halft                
   
   init <- function( ){
     
@@ -115,26 +115,29 @@ function(y, n, xmu.1,p.xmu, xsum.1,p.xsum, x0.1,p.x0, x1.1,p.x1,
     if(!is.null(inits[[i]]$R)) {
       notuse <-FALSE
       Rele <- inits[[i]]$R
-      size <- length(Rele)
+      size <- (sqrt(1+8*length(Rele))-1)/2 # (# of random effects)
       R <- diag(size)
       R[upper.tri(R, diag=TRUE)] <- Rele 
       R <- R + t(R) - diag(diag(R))
-      pd <- (eigen(R)$values>0)
+      pd <- all(eigen(R)$values>0)
       if(!pd) {
         notuse <- TRUE
         warning('the specified initial correlation matrix is not positive definite')
         warning('Internal initial value are used')
         break}
       else{
-        if(size==1) inits.internal[[i]][[25]] <-inits[[i]]$R
-        if(size==2){
-          inits.internal[[i]][[25]] <-inits[[i]]$R[1]; 
-          inits.internal[[i]][[26]] <-inits[[i]]$R[2]}
+        if(size==2) inits.internal[[i]][[15]] <-inits[[i]]$R[2]
         if(size==3){
-          inits.internal[[i]][[25]] <-inits[[i]]$R[1]; 
-          inits.internal[[i]][[26]] <-inits[[i]]$R[2]; 
-          inits.internal[[i]][[27]] <-inits[[i]]$R[3]}
+          inits.internal[[i]][[15]] <-inits[[i]]$R[2]; 
+          inits.internal[[i]][[16]] <-inits[[i]]$R[4]; 
+          inits.internal[[i]][[17]] <-inits[[i]]$R[5]}
       }
+      lower <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]-
+        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
+      upper <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]+
+        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
+      if(inits.internal[[i]][[17]]<lower | inits.internal[[i]][[17]]>upper)
+        inits.internal[[i]][[17]] <- runif(1, lower, upper)
     }
   }}
 

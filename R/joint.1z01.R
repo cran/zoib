@@ -70,24 +70,19 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1, x0.1, p.x0,
     for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init( ))) }  
   
   if(!is.null(inits)){   
-  for(i in 1:n.chain){
-    
+  for(i in 1:n.chain){    
     if(!is.null(inits[[i]]$b)) {
-      inits.internal[[i]][[1]] <- inits[[i]]$b[1]
-      inits.internal[[i]][[5]] <- matrix(rep(inits[[i]]$b[2:p.xmu],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[1]] <- inits[[i]]$b[1,]
+      inits.internal[[i]][[5]] <- array(rep(inits[[i]]$b[2:p.xmu,],4), c((p.xmu-1),q,4))}
     if(!is.null(inits[[i]]$d)) {
-      inits.internal[[i]][[2]] <- inits[[i]]$d[1]
-      inits.internal[[i]][[6]] <- matrix(rep(inits[[i]]$d[2:p.xsum],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[2]] <- inits[[i]]$d[1,]
+      inits.internal[[i]][[6]] <- array(rep(inits[[i]]$d[2:p.xsum,],4), c((p.xsum-1),q,4))}
     if(!is.null(inits[[i]]$b0)) {
-      inits.internal[[i]][[3]] <- inits[[i]]$b0[1]
-      inits.internal[[i]][[7]] <- matrix(rep(inits[[i]]$b0[2:p.x0],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[3]] <- inits[[i]]$b0[1,]
+      inits.internal[[i]][[7]] <- array(rep(inits[[i]]$b0[2:p.x0,],4), c((p.x0-1),q,4))}
     if(!is.null(inits[[i]]$b1)) {
-      inits.internal[[i]][[4]] <- inits[[i]]$b1[1]
-      inits.internal[[i]][[8]] <- matrix(rep(inits[[i]]$b1[2:p.x1],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[4]] <- inits[[i]]$b1[1,]
+      inits.internal[[i]][[8]] <- array(rep(inits[[i]]$b1[2:p.x1,],4), c((p.x1-1),q,4))}
     
     if(!is.null(inits[[i]]$sigma)) {
       inits.internal[[i]][[21]]<- inits[[i]]$sigma

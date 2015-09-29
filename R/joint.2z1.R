@@ -28,14 +28,14 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
   dataIn[[16]]<- matrix(0,n,q)   
   dataIn[[17]]<- link  
   dataIn[[18]]<- abind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD,along=3)    
-  if(grepl("unif", prior.Sigma)) dataIn[[24]] <- scale.unif
-  if(grepl("halfcauchy",prior.Sigma)) dataIn[[24]] <- scale.halft               
   dataIn[[19]] <- prior1
   dataIn[[20]] <- prior2    
   dataIn[[21]] <- rid
   dataIn[[22]] <- EUID 
   dataIn[[23]] <- nEU    
-    
+  if(grepl("unif", prior.Sigma)) dataIn[[24]] <- scale.unif
+  if(grepl("halfcauchy",prior.Sigma)) dataIn[[24]] <- scale.halft               
+  
   init <- function( ){
     
     rho1 <- runif(1,-0.5,0.5)
@@ -84,17 +84,14 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
   for(i in 1:n.chain){
     
     if(!is.null(inits[[i]]$b)) {
-      inits.internal[[i]][[1]] <- inits[[i]]$b[1]
-      inits.internal[[i]][[4]] <- matrix(rep(inits[[i]]$b[2:p.xmu],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[1]] <- inits[[i]]$b[1,]
+      inits.internal[[i]][[4]] <- array(rep(inits[[i]]$b[2:p.xmu,],4), c((p.xmu-1),q,4))}
     if(!is.null(inits[[i]]$d)) {
-      inits.internal[[i]][[2]] <- inits[[i]]$d[1]
-      inits.internal[[i]][[5]] <- matrix(rep(inits[[i]]$d[2:p.xsum],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[2]] <- inits[[i]]$d[1,]
+      inits.internal[[i]][[5]] <- array(rep(inits[[i]]$b[2:p.xsum,],4), c((p.xsum-1),q,4))}
     if(!is.null(inits[[i]]$b1)) {
-      inits.internal[[i]][[3]] <- inits[[i]]$b1[1]
-      inits.internal[[i]][[6]] <- matrix(rep(inits[[i]]$b1[2:p.x1],4), 
-                                         ncol=4, byrow=FALSE)}
+      inits.internal[[i]][[3]] <- inits[[i]]$b1[1,]
+      inits.internal[[i]][[6]] <- array(rep(inits[[i]]$b[2:p.x1,],4), c((p.x1-1),q,4))}
     
     if(!is.null(inits[[i]]$sigma)) {
       inits.internal[[i]][[16]]<- inits[[i]]$sigma
@@ -107,26 +104,29 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
     if(!is.null(inits[[i]]$R)) {
       notuse <-FALSE
       Rele <- inits[[i]]$R
-      size <- length(Rele)
+      size <- (sqrt(1+8*length(Rele))-1)/2 # (# of random effects)
       R <- diag(size)
       R[upper.tri(R, diag=TRUE)] <- Rele 
       R <- R + t(R) - diag(diag(R))
-      pd <- (eigen(R)$values>0)
+      pd <- all(eigen(R)$values>0)
       if(!pd) {
         notuse <- TRUE
         warning('the specified initial correlation matrix is not positive definite')
         warning('Internal initial value are used')
         break}
       else{
-        if(size==1) inits.internal[[i]][[20]] <-inits[[i]]$R
-        if(size==2){
-          inits.internal[[i]][[20]] <-inits[[i]]$R[1]; 
-          inits.internal[[i]][[21]] <-inits[[i]]$R[2]}
+        if(size==2) inits.internal[[i]][[15]] <-inits[[i]]$R[2]
         if(size==3){
-          inits.internal[[i]][[20]] <-inits[[i]]$R[1]; 
-          inits.internal[[i]][[21]] <-inits[[i]]$R[2]; 
-          inits.internal[[i]][[22]] <-inits[[i]]$R[3]}
+          inits.internal[[i]][[15]] <-inits[[i]]$R[2]; 
+          inits.internal[[i]][[16]] <-inits[[i]]$R[4]; 
+          inits.internal[[i]][[17]] <-inits[[i]]$R[5]}
       }
+      lower <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]-
+        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
+      upper <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]+
+        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
+      if(inits.internal[[i]][[17]]<lower | inits.internal[[i]][[17]]>upper)
+        inits.internal[[i]][[17]] <- runif(1, lower, upper)
     }
   }}
   op<- system.file("bugs", "joint_2z1.bug", package="zoib") 

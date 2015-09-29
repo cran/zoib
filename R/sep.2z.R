@@ -25,12 +25,12 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
   dataIn[[14]] <- prior1
   dataIn[[15]] <- prior2 
   dataIn[[16]] <- as.matrix(cbind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD))          
-  if(grepl("unif",prior.Sigma))  dataIn[[20]] <- scale.unif
-  if(grepl("halfcauchy",prior.Sigma)) dataIn[[20]] <- scale.halft   
   dataIn[[17]] <- rid
   dataIn[[18]] <- EUID 
   dataIn[[19]] <- nEU
-
+  if(grepl("unif",prior.Sigma))  dataIn[[20]] <- scale.unif
+  if(grepl("halfcauchy",prior.Sigma)) dataIn[[20]] <- scale.halft   
+  
   init <- function( ){
     rho1 <- runif(1,-0.5,0.5)
     rho2 <- runif(1,-0.5,0.5) 
@@ -92,25 +92,29 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
     if(!is.null(inits[[i]]$R)) {
       notuse <-FALSE
       Rele <- inits[[i]]$R
-      size <- length(Rele)
+      size <- (sqrt(1+8*length(Rele))-1)/2 # (# of random effects)
       R <- diag(size)
       R[upper.tri(R, diag=TRUE)] <- Rele 
       R <- R + t(R) - diag(diag(R))
-      pd <- (eigen(R)$values>0)
+      pd <- all(eigen(R)$values>0)
       if(!pd) {
         notuse <- TRUE
         warning('the specified initial correlation matrix is not positive definite')
         warning('Internal initial value are used')
         break}
       else{
-        if(size==1) inits.internal[[i]][[15]] <-inits[[i]]$R
-        if(size==2){
-          inits.internal[[i]][[15]] <-inits[[i]]$R[1]; 
-          inits.internal[[i]][[16]] <-inits[[i]]$R[2]}
+        if(size==2) inits.internal[[i]][[15]] <-inits[[i]]$R[2]
         if(size==3){
-          inits.internal[[i]][[15]] <-inits[[i]]$R[1]; 
-          inits.internal[[i]][[16]] <-inits[[i]]$R[2]; 
-          inits.internal[[i]][[17]] <-inits[[i]]$R[3]}}
+          inits.internal[[i]][[15]] <-inits[[i]]$R[2]; 
+          inits.internal[[i]][[16]] <-inits[[i]]$R[4]; 
+          inits.internal[[i]][[17]] <-inits[[i]]$R[5]}
+      }
+      lower <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]-
+        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
+      upper <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]+
+        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
+      if(inits.internal[[i]][[17]]<lower | inits.internal[[i]][[17]]>upper)
+        inits.internal[[i]][[17]] <- runif(1, lower, upper)
     }
   }}
   op<- system.file("bugs", "sep_2z.bug", package="zoib") 

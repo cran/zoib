@@ -49,21 +49,18 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
   if(n.chain >= 2) {
     for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init( ))) }   
   
-  if(!is.null(inits)){
-    
+  if(!is.null(inits)){  
   for(i in 1:n.chain){
-    
-    if(!is.null(inits[[i]]$b)) {
-      inits.internal[[i]][[1]] <- inits[[i]]$b[1]
-      inits.internal[[i]][[3]] <- matrix(rep(inits[[i]]$b[2:p.xmu],4), 
-                                         ncol=4, byrow=FALSE)}
-    if(!is.null(inits[[i]]$d)) {
-      inits.internal[[i]][[2]] <- inits[[i]]$d[1]
-      inits.internal[[i]][[4]] <- matrix(rep(inits[[i]]$d[2:p.xsum],4), 
-                                         ncol=4, byrow=FALSE)}    
-    if(!is.null(inits[[i]]$sigma)) {
-      inits.internal[[i]][[11]]<- inits[[i]]$sigma
-      inits.internal[[i]][[12]]<- inits[[i]]$sigma}
+    # if joint, b is matrix of p.xmu*q
+      if(!is.null(inits[[i]]$b)) {
+        inits.internal[[i]][[1]] <- inits[[i]]$b[1,]
+        inits.internal[[i]][[3]] <- array(rep(inits[[i]]$b[2:p.xmu,],4), c((p.xmu-1),q,4))}
+      if(!is.null(inits[[i]]$d)) {
+        inits.internal[[i]][[2]] <- inits[[i]]$d[1,]
+        inits.internal[[i]][[4]] <- array(rep(inits[[i]]$d[2:p.xsum,],4),c((p.xsum-1),q,4))}    
+      if(!is.null(inits[[i]]$sigma)) {
+        inits.internal[[i]][[11]]<- inits[[i]]$sigma
+        inits.internal[[i]][[12]]<- inits[[i]]$sigma}
   }}
   op<- system.file("bugs", "joint_1z.bug", package="zoib") 
   model <- jags.model(op,data=dataIn,n.adapt=0, inits=inits.internal, n.chains=n.chain)   

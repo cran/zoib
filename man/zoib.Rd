@@ -149,9 +149,9 @@ prior.Sigma
 **************
 initialization
 **************\cr
-specified in the following parameter order with the following parameter names:\cr
+specified in the following parameter order:\cr
 inits = list(list(b=, d=, b0=, b1=, sigma=, R=),list(b=, d=, b0=, b1=, sigma=, R=), ...)\cr
-each inner list represents the starting value for each MCMC chain. If initial values are given only for a subset of the parameters in a model, NULL should be specified for the others. The notations of b,d,b0,b1 are the same as in the "random" section above; each of them is specified in a vector containing the intercept, and regression coefficients corresponding to the respective x's. sigma is a vector containing the standard deviation of each random component, and R contains the lower triangle of the correlation matrix. For example, in a 3x3 correlation matrix, then R should be given as c(1,r21,1,r31,r32,1)
+each inner list represents the starting value for each MCMC chain. If initial values are only specified  for a subset of the parameters in a model, NULL should be specified for the rest. The notations of b, d, b0, b1 are the same as in the "random" section above, with each specified in a matrix with dimention (nx+1)*ny, where ny is the number of response variable, and nx is number of regression coefficients corresponding to the respective x's (+1 is the intercept). sigma is a vector containing the standard deviation of each random component, and R contains the lower triangle of the correlation matrix. For example, in a 3x3 correlation matrix, R is specified as c(1,r21,1,r31,r32,1).
 }
 
 \value{
