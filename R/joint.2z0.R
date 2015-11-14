@@ -84,19 +84,19 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
     
     if(!is.null(inits[[i]]$b)) {
       inits.internal[[i]][[1]] <- inits[[i]]$b[1,]
-      inits.internal[[i]][[4]] <- array(rep(inits[[i]]$b[2:p.xmu,],4), c((p.xmu-1),q,4))}
+      if(p.xmu>=2) inits.internal[[i]][[4]] <- array(rep(inits[[i]]$b[2:p.xmu,],4), c((p.xmu-1),q,4))}
     if(!is.null(inits[[i]]$d)) {
       inits.internal[[i]][[2]] <- inits[[i]]$d[1,]
-      inits.internal[[i]][[5]] <- array(rep(inits[[i]]$d[2:p.xsum,],4), c((p.xsum-1),q,4))}
+      if(p.xsum>=2) inits.internal[[i]][[5]] <- array(rep(inits[[i]]$d[2:p.xsum,],4), c((p.xsum-1),q,4))}
     if(!is.null(inits[[i]]$b0)) {
       inits.internal[[i]][[3]] <- inits[[i]]$b0[1,]
-      inits.internal[[i]][[6]] <- array(rep(inits[[i]]$b0[2:p.x0,],4), c((p.x0-1),q,4))}
+      if(p.x0>=2) inits.internal[[i]][[6]] <- array(rep(inits[[i]]$b0[2:p.x0,],4), c((p.x0-1),q,4))}
     
     if(!is.null(inits[[i]]$sigma)) {
       inits.internal[[i]][[16]]<- inits[[i]]$sigma
       inits.internal[[i]][[17]]<- inits[[i]]$sigma
-      inits.internal[[i]][[18]]<- inits[[i]]$sigma
-      inits.internal[[i]][[19]]<- inits[[i]]$sigma
+      inits.internal[[i]][[18]]<- runif(qz,0.25,2)
+      inits.internal[[i]][[19]]<- runif(qz,0.25,2)
     }
     
     # check PD of the initial R matrix
@@ -114,18 +114,18 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
         warning('Internal initial value are used')
         break}
       else{
-        if(size==2) inits.internal[[i]][[15]] <-inits[[i]]$R[2]
+        if(size==2) inits.internal[[i]][[20]] <-inits[[i]]$R[2]
         if(size==3){
-          inits.internal[[i]][[15]] <-inits[[i]]$R[2]; 
-          inits.internal[[i]][[16]] <-inits[[i]]$R[4]; 
-          inits.internal[[i]][[17]] <-inits[[i]]$R[5]}
+          inits.internal[[i]][[20]] <-inits[[i]]$R[2]; 
+          inits.internal[[i]][[21]] <-inits[[i]]$R[4]; 
+          inits.internal[[i]][[22]] <-inits[[i]]$R[5]}
       }
-      lower <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]-
-        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
-      upper <- inits.internal[[i]][[15]]*inits.internal[[i]][[16]]+
-        sqrt((1-inits.internal[[i]][[15]]^2)*(1-inits.internal[[i]][[16]]^2))
-      if(inits.internal[[i]][[17]]<lower | inits.internal[[i]][[17]]>upper)
-        inits.internal[[i]][[17]] <- runif(1, lower, upper)
+      lower <- inits.internal[[i]][[20]]*inits.internal[[i]][[21]]-
+        sqrt((1-inits.internal[[i]][[20]]^2)*(1-inits.internal[[i]][[21]]^2))
+      upper <- inits.internal[[i]][[20]]*inits.internal[[i]][[21]]+
+        sqrt((1-inits.internal[[i]][[20]]^2)*(1-inits.internal[[i]][[21]]^2))
+      if(inits.internal[[i]][[22]]<lower | inits.internal[[i]][[22]]>upper)
+        inits.internal[[i]][[22]] <- runif(1, lower, upper)
     }
   }}
   op<- system.file("bugs", "joint_2z0.bug", package="zoib") 

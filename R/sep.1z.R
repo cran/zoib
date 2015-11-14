@@ -55,12 +55,12 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
     
     if(!is.null(inits[[i]]$b)) {
       inits.internal[[i]][[1]] <- inits[[i]]$b[1]
-      inits.internal[[i]][[3]] <- matrix(rep(inits[[i]]$b[2:p.xmu],4), 
-                                         ncol=4, byrow=FALSE)}
+      if(p.xmu>=2) inits.internal[[i]][[3]] <- 
+        matrix(rep(inits[[i]]$b[2:p.xmu],4),ncol=4, byrow=FALSE)}
     if(!is.null(inits[[i]]$d)) {
       inits.internal[[i]][[2]] <- inits[[i]]$d[1]
-      inits.internal[[i]][[4]] <- matrix(rep(inits[[i]]$d[2:p.xsum],4), 
-                                         ncol=4, byrow=FALSE)}    
+      if(p.xsum>=2) inits.internal[[i]][[4]] <- 
+        matrix(rep(inits[[i]]$d[2:p.xsum],4), ncol=4, byrow=FALSE)}    
     if(!is.null(inits[[i]]$sigma)) {
       inits.internal[[i]][[11]]<- inits[[i]]$sigma
       inits.internal[[i]][[12]]<- inits[[i]]$sigma}

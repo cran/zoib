@@ -404,7 +404,6 @@ function(
       post.samples <- vector("list", q) 
       for(i in 1:q)
       {
-      
         if(nz0>1){ 
           if(one.inflation[i] & zero.inflation[i]){ 
             model[[i]]<- sep.2z01(y[,i],n, xmu.1, p.xmu, xsum.1,p.xsum, x0.1,p.x0, x1.1,p.x1, 
