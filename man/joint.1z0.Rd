@@ -11,7 +11,7 @@ Internal function to be called by function zoib. Jointly models multiple [0,1)-b
 \usage{
 joint.1z0(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, inflate0, rid, EUID, 
 nEU, prior1, prior2, prior.beta, prior.Sigma, prec.int, prec.DN, lambda.L1, 
-lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chain,inits)
+lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chain,inits, seed)
 }
 \arguments{
   \item{y}{
@@ -94,6 +94,9 @@ lambda.L2, lambda.ARD, scale.unif, scale.halft, link, n.chain,inits)
 }
   \item{inits}{
   initial parameter for model parameters.
+}
+  \item{seed}{
+  seeds for results reproducibility
 }
 }
 \value{

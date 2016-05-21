@@ -9,7 +9,7 @@ Internal function called by function zoib; Fits a fixed-effects beta regression 
 }
 \usage{
 fixed1(y, n, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1, prior1, prec.int, prec.DN,
-lambda.L1, lambda.L2, lambda.ARD, link, n.chain,inits)
+lambda.L1, lambda.L2, lambda.ARD, link, n.chain,inits, seed)
 }
 
 \arguments{
@@ -63,6 +63,9 @@ lambda.L1, lambda.L2, lambda.ARD, link, n.chain,inits)
 }
   \item{inits}{
   initial parameter for model parameters.
+}
+  \item{seed}{
+  seeds for results reproducibility
 }
 }
 

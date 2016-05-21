@@ -9,7 +9,7 @@ Internal function to be called by function zoib; Fits a fixed-effects beta regre
 }
 \usage{
 fixed(y, n, xmu.1, p.xmu, xsum.1, p.xsum, prior1, prec.int, prec.DN, lambda.L1,
-lambda.L2, lambda.ARD, link, n.chain,inits)
+lambda.L2, lambda.ARD, link, n.chain,inits, seed)
 }
 \arguments{
   \item{y}{
@@ -56,6 +56,9 @@ lambda.L2, lambda.ARD, link, n.chain,inits)
 }
   \item{inits}{
   initial parameter for model parameters.
+}
+  \item{seed}{
+  seeds for results reproducibility
 }
 }
 

@@ -3,7 +3,7 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
                       inflate1, zdummy, qz,nz0, m, rid, EUID, nEU,
                       prior1, prior2, prior.beta, prior.Sigma, 
                       prec.int, prec.DN, lambda.L1, lambda.L2,lambda.ARD,
-                      scale.unif, scale.halft, link, n.chain, inits) 
+                      scale.unif, scale.halft, link, n.chain, inits, seed) 
 { 
   dataIn <- vector("list",24)
   dataIn.name <- c("y","n","q","xmu.1","p.xmu", "xsum.1","p.xsum","x1.1",
@@ -36,8 +36,47 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
   if(grepl("unif", prior.Sigma)) dataIn[[24]] <- scale.unif
   if(grepl("halfcauchy",prior.Sigma)) dataIn[[24]] <- scale.halft               
   
-  init <- function( ){
-    
+  
+  if(is.null(seed)){
+    init <- function( rngname, rngseed){
+      rho1 <- runif(1,-0.5,0.5)
+      rho2 <- runif(1,-0.5,0.5) 
+      rho3 <- runif(1, rho1*rho2 - sqrt((1-rho1^2)*(1-rho2^2)), 
+                    rho1*rho2 + sqrt((1-rho1^2)*(1-rho2^2)))
+      return(
+        list("tmp1" = rnorm(q,0,0.1),
+             "tmp2" = rnorm(q,0,0.1),
+             "tmp3" = rnorm(q,0,0.1),
+             
+             "b.tmp"  = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
+             "d.tmp"  = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
+             "b1.tmp" = matrix(rnorm((p.x1-1)*4,0,0.1), ncol=4),
+             
+             "sigmab.L1" = runif((p.xmu-1),0,2), 
+             "sigmad.L1" = runif((p.xsum-1),0,2), 
+             "sigmab1.L1" = runif((p.x1-1),0,2), 
+             
+             "taub.ARD" = runif((p.xmu-1),0,2), 
+             "taud.ARD" = runif((p.xsum-1),0,2), 
+             "taub1.ARD" = runif((p.x1-1),0,2), 
+             
+             "taub.L2" = runif(1,0,2), 
+             "taud.L2" = runif(1,0,2),
+             "taub1.L2" = runif(1,0,2),
+             
+             "sigma.VC1" = runif(nz0,0.25,2),
+             "t" = runif(nz0,0.25,1),         
+             "scale1" = runif(qz,0.25,2),
+             "scale2" = runif(qz,0.25,2),
+             
+             "rho1" = rho1,
+             "rho2" = rho2,
+             "rho3" = rho3))}
+      inits.internal <- list(init( ));
+      if(n.chain >= 2) {
+        for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init()))} 
+    } else{
+  init <- function(rngname, rngseed){    
     rho1 <- runif(1,-0.5,0.5)
     rho2 <- runif(1,-0.5,0.5) 
     rho3 <- runif(1, rho1*rho2 - sqrt((1-rho1^2)*(1-rho2^2)), 
@@ -70,15 +109,21 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x1.1, p.x1,
            
            "rho1" = rho1,
            "rho2" = rho2,
-           "rho3" = rho3))} 
+           "rho3" = rho3,
+           
+           .RNG.name = rngname, 
+           .RNG.seed = rngseed))} 
   
   # 1b, 2d, 3b0, 4d1, 
   # 5 SigmaVC (sigma.VC1 or t),SigmaUN (scale1 or scale2),
   # 6 rho1,2,3
-  inits.internal <- list(init( ));
+  set.seed(seed[1]); inits.internal <- list(init("base::Super-Duper", seed[1]));
   if(n.chain >= 2) {
-    for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init( ))) }   
+    for(j in 2:n.chain){ 
+      set.seed(seed[j]); 
+      inits.internal <- c(inits.internal,list(init("base::Wichmann-Hill",seed[j])))}}  
   
+    }
   if(!is.null(inits)){
     
   for(i in 1:n.chain){

@@ -1,6 +1,6 @@
 fixed0 <-
 function(y, n, xmu.1, p.xmu, xsum.1,p.xsum, x0.1,p.x0, prior1, prec.int,  
-                   prec.DN,  lambda.L1, lambda.L2, lambda.ARD, link,n.chain, inits)
+         prec.DN,  lambda.L1, lambda.L2, lambda.ARD, link,n.chain, inits, seed)
 {
   dataIn <- vector("list",12)  
   dataIn.name <- c("y","xmu.1","p.xmu","xsum.1","p.xsum", "x0.1","p.x0",
@@ -19,26 +19,60 @@ function(y, n, xmu.1, p.xmu, xsum.1,p.xsum, x0.1,p.x0, prior1, prec.int,
   dataIn[[11]]<- as.matrix(cbind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD))
   dataIn[[12]]<- link
   
-  init <- function( ){
-    list("tmp1" = rnorm(1,0,0.1),
-         "tmp2" = rnorm(1,0,0.1),
-         "tmp3" = rnorm(1,0,0.1),
-         "b.tmp" = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
-         "d.tmp" = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
-         "b0.tmp" = matrix(rnorm((p.x0-1)*4,0,0.1),ncol=4),
-         "sigmab.L1" = runif((p.xmu-1),0,2), 
-         "sigmad.L1" = runif((p.xsum-1),0,2), 
-         "sigmab0.L1" = runif((p.x0-1),0,2), 
-         "taub.ARD" = runif((p.xmu-1),0,2), 
-         "taud.ARD" = runif((p.xsum-1),0,2), 
-         "taub0.ARD" = runif((p.x0-1),0,2), 
-         "taub.L2" = runif(1,0,2), 
-         "taud.L2" = runif(1,0,2),
-         "taub0.L2" = runif(1,0,2))}      
-  inits.internal <- list(init( ));
-  if(n.chain >= 2) {
-    for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init( ))) }   
   
+  if(is.null(seed)){
+    init <- function( rngname, rngseed){
+      list("tmp1" = rnorm(1,0,0.1),
+           "tmp2" = rnorm(1,0,0.1),
+           "tmp3" = rnorm(1,0,0.1),
+           
+           "b.tmp" = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
+           "d.tmp" = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
+           "b0.tmp" = matrix(rnorm((p.x0-1)*4,0,0.1),ncol=4),
+           
+           "sigmab.L1" = runif((p.xmu-1),0,2), 
+           "sigmad.L1" = runif((p.xsum-1),0,2), 
+           "sigmab0.L1" = runif((p.x0-1),0,2), 
+           
+           "taub.ARD" = runif((p.xmu-1),0,2), 
+           "taud.ARD" = runif((p.xsum-1),0,2), 
+           "taub0.ARD" = runif((p.x0-1),0,2), 
+           "taub.L2" = runif(1,0,2), 
+           "taud.L2" = runif(1,0,2),
+           "taub0.L2" = runif(1,0,2))} 
+      inits.internal <- list(init( ));
+      if(n.chain >= 2) {
+        for(j in 2:n.chain) inits.internal <- c(inits.internal,list(init()))} 
+    } else{
+      init <- function(rngname, rngseed){
+      list("tmp1" = rnorm(1,0,0.1),
+           "tmp2" = rnorm(1,0,0.1),
+           "tmp3" = rnorm(1,0,0.1),
+           
+           "b.tmp" = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
+           "d.tmp" = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
+           "b0.tmp" = matrix(rnorm((p.x0-1)*4,0,0.1),ncol=4),
+           
+           "sigmab.L1" = runif((p.xmu-1),0,2), 
+           "sigmad.L1" = runif((p.xsum-1),0,2), 
+           "sigmab0.L1" = runif((p.x0-1),0,2), 
+           
+           "taub.ARD" = runif((p.xmu-1),0,2), 
+           "taud.ARD" = runif((p.xsum-1),0,2), 
+           "taub0.ARD" = runif((p.x0-1),0,2), 
+           "taub.L2" = runif(1,0,2), 
+           "taud.L2" = runif(1,0,2),
+           "taub0.L2" = runif(1,0,2),
+           
+           .RNG.name = rngname, 
+           .RNG.seed = rngseed)}      
+      set.seed(seed[1]); inits.internal <- list(init("base::Super-Duper", seed[1]));
+      if(n.chain >= 2) {
+        for(j in 2:n.chain){ 
+          set.seed(seed[j]); 
+          inits.internal <- c(inits.internal,list(init("base::Wichmann-Hill",seed[j])))}}  
+    }
+    
   if(!is.null(inits)){    
     for(i in 1:n.chain){   
       if(!is.null(inits[[i]]$b)) {
