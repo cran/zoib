@@ -1,4 +1,4 @@
-64c775eae79eb28af1d700deb89c6a83 *DESCRIPTION
+7d309fdf98122594df1fcc2783ff052a *DESCRIPTION
 7b1e7db9ab69c1afd021910661e5112d *NAMESPACE
 3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
@@ -22,7 +22,7 @@ ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
 6698c856c9c0f71718812b763c19933f *R/sep.2z0.R
 0797b4b28f95b8b698d940e62c108cb7 *R/sep.2z01.R
 d167371c4816c092d564b78853c8045b *R/sep.2z1.R
-e73bcf94cc2b78cd36ad24cd80c41911 *R/zoib.R
+0a9bc6be2df1247b3f01ca64db8392d3 *R/zoib.R
 c47c16e512e561667db0a00ee3e63e93 *data/AlcoholUse.rda
 6069434c7371e055b4db675eb116e405 *data/BiRepeated.rda
 1e121d64e99a1a3f21d205a6283b6385 *data/GasolineYield.rda
@@ -71,7 +71,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-d33b3a3cb3f1764daa77f78294148ef7 *man/zoib-package.Rd
+f9f2a1df61aab27bab1dae283d989b09 *man/zoib-package.Rd
 bad7a8d0d8a89836ed0673b2236f9d43 *man/zoib.Rd
-8624125adef1be4c9a308229d0afdb6d *tests/test1.R
+c73cebc6b3e74186fb31be3c2f1c49af *tests/test1.R
 bfdcf6382f7cd682b879c257c3c966df *tests/test2.R
