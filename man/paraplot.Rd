@@ -12,7 +12,7 @@ paraplot plots the posterior mode, mean, or median with Bayesian credible interv
 \usage{
 paraplot(para1, para2=NULL, para3=NULL, para4=NULL,
           tickx=NULL, jitter=NULL, pch = 1:4, col=1:4, 
-          legpos=NULL, legtext, annotate=FALSE)
+          legpos=NULL, legtext=NULL, annotate=FALSE)
 }
 
 
@@ -44,6 +44,7 @@ Fang Liu (fang.liu.131@nd.edu)
 
 \examples{
   \dontrun{
+  # eg 1
   set.seed(12) 
   x=rnorm(4); para1 = cbind(x, x-1,x+1); rownames(para1) = c("a","b","c","d")
   x=rnorm(4)+1; para2 = cbind(x, x-1,x+1); rownames(para2) = c("a","b","e","f")
@@ -51,5 +52,13 @@ Fang Liu (fang.liu.131@nd.edu)
   paraplot(para1, para2, para3, para4=NULL, legpos=c(-1.5,6),
             legtext=c("model 1","model 2","model 3"),annotate=TRUE)
   paraplot(para1, legpos=c(-2,3), legtext="m1", annotate=TRUE)
+  
+  # eg 2
+  eg.random <- zoib(yield ~ temp | 1 | 1, data=GasolineYield,
+                  joint = FALSE, random=1, EUID=GasolineYield$batch,
+                  zero.inflation = FALSE, one.inflation = FALSE,
+                  n.iter=1000, n.thin=2, n.burn=200)
+  sample2 <- eg.random$coeff
+  paraplot(summary(sample2)[[2]][,c(3,1,5)], annotate=TRUE)
 	}
 }

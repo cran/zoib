@@ -1,6 +1,6 @@
-7d309fdf98122594df1fcc2783ff052a *DESCRIPTION
+fa0c7b56211cbd4c46665ec1b6e4a19f *DESCRIPTION
 7b1e7db9ab69c1afd021910661e5112d *NAMESPACE
-3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
+6b1507cbff6ee7d4b85bb61509d03432 *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
 148148a33cd052f3a336d002448063d3 *R/fixed0.R
 b3328b12b7394b5928b78272472e6348 *R/fixed01.R
@@ -13,7 +13,7 @@ b26aa3be76b378a78363dc61f5a38f66 *R/joint.2z.R
 a9f2ff3688624077fcfb3e403bda45b4 *R/joint.2z0.R
 6dfbc96298fe3aa73d6111878743433b *R/joint.2z01.R
 e467448a66f1074860dc84ef5a461a23 *R/joint.2z1.R
-02ac4a91388c62bae4f8ff0e8f4a79b6 *R/paraplot.R
+61650379655c7f30650df4dc485d8727 *R/paraplot.R
 1f95704b11a39c1088bdeace2150c708 *R/sep.1z.R
 9a62ffc5fb385af241cf8ee12b492e82 *R/sep.1z0.R
 ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
@@ -62,7 +62,7 @@ a928615caac346266cff68e73fc4d73d *man/joint.2z.Rd
 35d2748dec948d31dc7fa490d6e03f0d *man/joint.2z0.Rd
 b13ac523cdcc1354873bc11e60ea8ca2 *man/joint.2z01.Rd
 6b35ee24c5fe17ef9c0bcecfa9476062 *man/joint.2z1.Rd
-a62c1b3005af690a0beedfe4914b83d0 *man/paraplot.Rd
+e3271fef173139f9e9b644f3308a29c6 *man/paraplot.Rd
 b101d1442c719ca992ee578db0e121b6 *man/sep.1z.Rd
 8c896549ac13de077eaeaa4a65fe3584 *man/sep.1z0.Rd
 d3bba5e61725194aaec1887f38e80c2d *man/sep.1z01.Rd
@@ -71,7 +71,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-f9f2a1df61aab27bab1dae283d989b09 *man/zoib-package.Rd
+fbd2992d0d3b93b0e2e7af41d823f439 *man/zoib-package.Rd
 bad7a8d0d8a89836ed0673b2236f9d43 *man/zoib.Rd
-c73cebc6b3e74186fb31be3c2f1c49af *tests/test1.R
+cfead258c1aece834803d9c8e3694c3c *tests/test1.R
 bfdcf6382f7cd682b879c257c3c966df *tests/test2.R

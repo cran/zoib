@@ -1,3 +1,48 @@
+my.mcmc <-
+  function (data = NA, start = 1, end = numeric(0), thin = 1, 
+            nom.start=start, nom.end=end) 
+  {
+    if (is.matrix(data)) {
+      niter <- nrow(data)
+      nvar <- ncol(data)
+    }
+    else if (is.data.frame(data)) {
+      if (!all(sapply(data, is.numeric))) {
+        stop("Data frame contains non-numeric values")
+      }
+      data <- as.matrix(data)
+      niter <- nrow(data)
+      nvar <- ncol(data)
+    }
+    else {
+      niter <- length(data)
+      nvar <- 1
+    }
+    thin <- round(thin)
+    if (length(start) > 1) 
+      stop("Invalid start")
+    if (length(end) > 1) 
+      stop("Invalid end")
+    if (length(thin) != 1) 
+      stop("Invalid thin")
+    if (missing(end)) 
+      end <- start + (niter - 1) * thin
+    else if (missing(start)) 
+      start <- end - (niter - 1) * thin
+    nobs <- floor((end - start)/thin + 1)
+    if (niter < nobs) 
+      stop("Start, end and thin incompatible with data")
+    else {
+      end <- start + thin * (nobs - 1)
+      if (nobs < niter) 
+        data <- data[1:nobs, , drop = FALSE]
+    }
+    attr(data, "mcpar") <- c(nom.start, nom.end, thin)
+    attr(data, "class") <- "mcmc"
+    data
+  }
+
+
 check.psrf <-
 function(post1=NULL, post2=NULL, post3=NULL, post4=NULL, post5=NULL)
 {
@@ -21,30 +66,33 @@ function(post1=NULL, post2=NULL, post3=NULL, post4=NULL, post5=NULL)
     }
     MCMC.list <- mcmc.list(draw)
   }
-
-  x <- MCMC.list  
-  Niter <- niter(x)
-  Nchain <- nchain(x)
+  Nchain <- nchain(MCMC.list)
+  Niter <- niter(MCMC.list)
+  XXX <- as.list(1:Nchain)
+  for(k in 1:Nchain){
+    tmp <- MCMC.list[[k]]
+    XXX[[k]]<- my.mcmc(tmp, thin=1, nom.start=1, nom.end=Niter)}
+  x<- mcmc.list(XXX) 
+ 
   Nvar <- nvar(x)
   xnames <- varnames(x)
   x <- lapply(x, as.matrix)
-  S2 <- array(sapply(x, var, simplify = TRUE), 
-              dim = c(Nvar, Nvar, Nchain))
+  S2 <- array(sapply(x, var, simplify = TRUE), dim = c(Nvar, Nvar, Nchain))
   W <- apply(S2, c(1, 2), mean)
   PD <- is.positive.definite(W)    
   
   if(!PD)
   { 
-    psrf.s <- gelman.diag(MCMC.list, multivariate=FALSE)$psrf
+    psrf.s <- gelman.diag(XXX, multivariate=FALSE)$psrf
     psrf.m <- NULL
     print("the covariance matrix of the posterior samples is not")  
     print("positive definite, and the multivarite psrf cannot be")
     print("computed") 
   }
   else{
-    gelman.plot(MCMC.list)
-    psrf.s <- gelman.diag(MCMC.list)[[1]]
-    psrf.m <- gelman.diag(MCMC.list)[[2]]
+    gelman.plot(XXX)
+    psrf.s <- gelman.diag(XXX)[[1]]
+    psrf.m <- gelman.diag(XXX)[[2]]
   }
   par(mfrow=c(1,2),mar=c(2,2,1,1)) 
   boxplot(psrf.s[,1]); mtext("psrf",1,cex=1.2)  
