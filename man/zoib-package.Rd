@@ -12,8 +12,8 @@ beta regression and zero/one inflated beta regression on data with [0,1]-bounded
 \tabular{ll}{
 Package: \tab zoib\cr
 Type: \tab Package\cr
-Version: \tab 1.4.1\cr
-Date: \tab 2016-07-25\cr
+Version: \tab 1.4.2\cr
+Date: \tab 2016-10-18\cr
 License: \tab GPL (>= 3)\cr
 }
 }
@@ -31,9 +31,12 @@ Maintainer: Fang Liu (\email{fang.liu.131@nd.edu})
 }
 \references{
 Liu, F. and Li, Q. (2014). A Bayesian Model for Joint Analysis of Multivariate 
-Repeated Measures and Time to Event Data in Crossover Trials, Statistical Methods in Medical Research, doi: 10.1177/0962280213519594
+Repeated Measures and Time to Event Data in Crossover Trials, Statistical Methods in Medical Research, DOI: 10.1177/0962280213519594
 
 Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, The R Journal, 7(2):34-51
+
+Liu, F. and Eugenio, E.(2016). A review and comparison of Bayesian and likelihood-based inferences in beta regression and zero-or-one-inflated beta regression,
+atistical Methods in Medical Research, DOI: 10.1177/0962280216650699
 }
 
 \seealso{

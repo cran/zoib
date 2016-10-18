@@ -1,47 +1,3 @@
-my.mcmc <-
-  function (data = NA, start = 1, end = numeric(0), thin = 1, 
-            nom.start=start, nom.end=end) 
-{
-  if (is.matrix(data)) {
-    niter <- nrow(data)
-    nvar <- ncol(data)
-  }
-  else if (is.data.frame(data)) {
-    if (!all(sapply(data, is.numeric))) {
-      stop("Data frame contains non-numeric values")
-    }
-    data <- as.matrix(data)
-    niter <- nrow(data)
-    nvar <- ncol(data)
-  }
-  else {
-    niter <- length(data)
-    nvar <- 1
-  }
-  thin <- round(thin)
-  if (length(start) > 1) 
-    stop("Invalid start")
-  if (length(end) > 1) 
-    stop("Invalid end")
-  if (length(thin) != 1) 
-    stop("Invalid thin")
-  if (missing(end)) 
-    end <- start + (niter - 1) * thin
-  else if (missing(start)) 
-    start <- end - (niter - 1) * thin
-  nobs <- floor((end - start)/thin + 1)
-  if (niter < nobs) 
-    stop("Start, end and thin incompatible with data")
-  else {
-    end <- start + thin * (nobs - 1)
-    if (nobs < niter) 
-      data <- data[1:nobs, , drop = FALSE]
-  }
-  attr(data, "mcpar") <- c(nom.start, nom.end, thin)
-  attr(data, "class") <- "mcmc"
-  data
-}
-
 zoib <-
 function( 
   model, 
@@ -138,10 +94,10 @@ function(
       x1 <- as.matrix(model.matrix(formula,data=mod,rhs=4))
     }
     else{
-      if(any(one.inflation) & all(!zero.inflation)){
-        x1 <- as.matrix(model.matrix(formula,data=mod,rhs=3))}
-      else if(any(zero.inflation) & !all(one.inflation)){
-        x0 <- as.matrix(model.matrix(formula,data=mod,rhs=3))}
+      if(any(one.inflation) & all(!zero.inflation))
+        x1 <- as.matrix(model.matrix(formula,data=mod,rhs=3))
+      else if(any(zero.inflation) & !all(one.inflation))
+        x0 <- as.matrix(model.matrix(formula,data=mod,rhs=3))
                         
       z <- as.matrix(model.matrix(formula,data=mod,rhs=4))
       zname <- c("int",colnames(z))
@@ -732,53 +688,46 @@ function(
         if(any(zero.inflation) & !all(one.inflation)) X1 <-  x1
       }}
 
-  nburn1 <- n.burn/n.thin
+  nburn <- n.burn/n.thin
   ypredcol <-  which(substr(colnames(post.samples.raw[[1]]),1,5)=="ypred")
   #phicol <-  which(substr(colnames(post.samples.raw[[1]]),1,3)=="phi")
-  #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn1),1:(phicol[1]-1)]),
-  #                   mcmc(post.samples.raw[[2]][-(1:nburn1),1:(phicol[1]-1)]))
-  
-  XXX <- as.list(1:n.chain)
-  coeff.nm <- c(colnames(Xbeta.mean),colnames(Xbeta.sum),colnames(X0),colnames(X1))
-  for(k in 1:n.chain){
-    tmp <- post.samples.raw[[k]][-(1:nburn1),1:(ypredcol[1]-1)]
-    colnames(tmp)[1:length(coeff.nm)]<- coeff.nm
-    XXX[[k]]<- my.mcmc(tmp, thin=n.thin, nom.start=n.burn+1, nom.end=n.iter)}
-  coeff <- mcmc.list(XXX) 
-                    
+  #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(phicol[1]-1)]),
+  #                   mcmc(post.samples.raw[[2]][-(1:nburn),1:(phicol[1]-1)]))
+  coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
+                     mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
+                     
   # get predicted value
-  XXX <- as.list(1:n.chain)
-  for(k in 1:n.chain) 
-    XXX[[k]]<- my.mcmc(post.samples.raw[[k]][-(1:nburn1),ypredcol], thin=n.thin,
-                    nom.start=n.burn+1, nom.end=n.iter)
-  ypred <- mcmc.list(XXX) 
+  pred1 <- post.samples.raw[[1]][-(1:nburn),ypredcol]
+  pred2 <- post.samples.raw[[2]][-(1:nburn),ypredcol] 
+  ypred <- mcmc.list(mcmc(pred1), mcmc(pred2))
 
   # residuals
   yobs <- c(y); 
   howmany <- length(yobs)
   names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
-  XXX <- as.list(1:n.chain)
-  for(k in 1:n.chain){
-    resid <- yobs- post.samples.raw[[k]][-(1:nburn1),ypredcol]; 
-    colnames(resid)<- names
-    XXX[[k]]<- my.mcmc(resid, thin=n.thin, nom.start=n.burn+1, nom.end=n.iter)
-  }
-  resid <- mcmc.list(XXX) 
- 
+  resid1 <- yobs-pred1; colnames(resid1)<- names
+  resid2 <- yobs-pred2; colnames(resid2)<- names
+  resid <- mcmc.list(mcmc(resid1), mcmc(resid2))
+  
   # standardized residuals
   names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
-  XXX <- as.list(1:n.chain)
-  for(k in 1:n.chain){
-    resid <- yobs- post.samples.raw[[k]][-(1:nburn1),ypredcol]; 
-    resid <- resid/apply(resid,2,sd); colnames(resid)<- names
-    colnames(resid)<- names
-    XXX[[k]]<- my.mcmc(resid, thin=n.thin, nom.start=n.burn+1, nom.end=n.iter)
-  }
-  resid.std<- mcmc.list(XXX) 
+  resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
+  resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
+  resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
   
+  print("NOTE: in the header of Markov Chain Monte Carlo (MCMC) output of")
+  print("parameters (coeff), predicted values (ypred), residuals (resid),")
+  print("and standardized residuals (resid.std), *Start, End, Thinning Interval*")
+  print("values are after the initially burning and thinning periods")
+  print("specified by the user. For example, n.iter = 151, n.thin = 2, n.burn=1,")
+  print("then MCMC header of the *coeff* output would be as follows") 
+  print("Markov Chain Monte Carlo (MCMC) output:")
+  print("Start = 1")
+  print("End = 75")
+  print("Thinning interval = 1")
   
   return(list(model= model.format, MCMC.model= model, 
-              Xb= Xbeta.mean, Xd= Xbeta.sum, X0= X0, X1=X1, 
+              Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= X0, Xb1=X1, 
               coeff= coeff, ypred= ypred, yobs= yobs, 
               resid= resid, resid.std= resid.std))
 }

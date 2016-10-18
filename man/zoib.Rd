@@ -182,6 +182,9 @@ The notations b, d, b0, b1 are the same as in the "random" section above, with e
 Liu, F. and Kong, Y. (2015). ZOIB:  an R Package for Bayesian Inferences in Beta and Zero One Inflated Beta Regression Models, The R Journal, 7(2):34-51 
 
 Liu, F. and Li, Q. (2014) A Bayesian Model for Joint Analysis of Multivariate  Repeated Measures and Time to Event Data in Crossover Trials, Statistical Methods  in Medical Research, doi: 10.1177/0962280213519594
+
+Liu, F. and Eugenio, E.(2016). A review and comparison of Bayesian and likelihood-based inferences in beta regression and zero-or-one-inflated beta regression,
+atistical Methods in Medical Research, DOI: 10.1177/0962280216650699
 }
 
 \author{

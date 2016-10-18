@@ -1,6 +1,6 @@
 paraplot <- function(para1, para2=NULL, para3=NULL, para4=NULL,
                       tickx=NULL, jitter=NULL, pch = 1:4, col=1:4, 
-                      legpos=NULL, legtext=NULL, annotate=FALSE)
+                      legpos=NULL, legtext, annotate=FALSE)
 {
   K <- 4
   if(is.null(para4)) K <- K-1
@@ -14,7 +14,7 @@ paraplot <- function(para1, para2=NULL, para3=NULL, para4=NULL,
     index <- 1:p
     l <- min(para1[,2])
     u <- max(para1[,3])
-    plot(para1[,1], index, xlim=c(l-abs(l)*0.3,u), ylim=c(1,p+1), axes=F, 
+    plot(para1[,1], index, xlim=c(l-abs(l)*0.1,u), ylim=c(1,p+1), axes=F, 
          pch=pch[1], col=col[1], xlab="", ylab="")
     segments(para1[,2],index, para1[,3], index, col=col[1])
     axis(2, at=NULL, labels=FALSE, tick = FALSE)
@@ -22,10 +22,9 @@ paraplot <- function(para1, para2=NULL, para3=NULL, para4=NULL,
     else axis(1,tickx)
     if(annotate){
       if(is.null(rownames(para1))) stop("Assign row names to the parameter object")
-      else text(rep(l-abs(l)*0.15,p), 1:p, rownames(para1), cex=1.0)
+      else text(rep(l-abs(l)*0.15,p), 1:p, rownames(para1), cex=1.2)
     }
-    if(!is.null(legtext))
-       legend(legpos[1], legpos[2], legtext, pch=pch[1], col=pch[1], lty=1, cex=1.2)  
+    legend(legpos[1], legpos[2], legtext, pch=pch[1], col=pch[1], lty=1, cex=1.2)  
   }
   else if(K>=2){
     mesg <- "Assign row names to the parameter object. \n Use the same row name if two parameter \n objects share the same parameter."
