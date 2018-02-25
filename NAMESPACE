@@ -5,6 +5,6 @@ import(matrixcalc)
 import(Formula)
 import(abind)
 importFrom("graphics", "axis", "boxplot", "legend", "mtext", "par","plot", "points", "segments", "text")
-importFrom("stats", "model.frame", "model.matrix", "rnorm", "runif","sd", "var")
-export(check.psrf, zoib, paraplot)
+importFrom("stats", "model.frame", "model.matrix", "rnorm", "runif","sd", "var","median","quantile")
+export(check.psrf, zoib, paraplot, pred.zoib)
 

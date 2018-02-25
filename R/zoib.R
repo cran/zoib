@@ -141,13 +141,16 @@ function(
     xsum <- as.matrix(model.matrix(formula,data=mod,rhs=2))
   }
   else if(nterm[2L]<2L){    
-    warning("RHS should have at least two parts; intercept only model is used to")
-    warning("model the sum of the two shape parameters of the beta distribution") 
-      xmu <- as.matrix(model.matrix(formula,data=mod,rhs=1))
-      xsum <- as.matrix(rep(1,nrow(xsum)))
+   # xmu <- as.matrix(model.matrix(formula,data=mod,rhs=1))
+   # xsum <- as.matrix(rep(1,nrow(xsum)))
+    warning("The right side of the model should have at least two parts;")
+    warning("or two link functions, one for the mean of beta distribution")
+    warning("alpha/(alpha+beta) and one for the sum (alpha+beta)")
+    stop("please re-specify the model")
+    # warning("The model with an intercept is for modelling the sum of the")
+    # warning("two shape parameters of the beta distribution") 
   }
 
-  
   if(is.null(ncol(y))) y<-as.matrix(y,ncol=1)
   n <- nrow(y)
   q <- ncol(y)
@@ -233,8 +236,8 @@ function(
   print("***************************************************************************") 
   print("* List of parameter for which the posterior samples are generated         *")
   print("* b: regression coeff in the linear predictor for the mean of beta dist'n *")
-  print("* d: regression coeff in the linear predictor for the sum of the two shape*")
-  print("*    parameters in the beta distribution                                  *")
+  print("* d: regression coeff in the linear predictor for the sum of the two      *")
+  print("*    shape parameters in the beta distribution                            *")
   print("* b0: regression coeff in the linear predictor for Prob(y=0)              *")
   print("* b1: regression coeff in the linear predictor for Prob(y=1)              *")   
   print("***************************************************************************")
@@ -270,7 +273,7 @@ function(
         para.list <- c("b","d")}
       
       para.list <- c(para.list,"ypred") #"phi"    
-      print(para.list)
+      #print(para.list)
       post.samples[[i]]<- coda.samples(model[[i]], para.list, n.iter=n.iter, thin=n.thin) 
 
       dim.para  <- dim(post.samples[[i]][[1]]) 
@@ -470,7 +473,7 @@ function(
         }
         
         para.list <- c(para.list, "ypred") # "phi" 
-        print(para.list)
+        #print(para.list)
         post.samples[[i]]<- coda.samples(model[[i]], para.list, thin=n.thin, n.iter=n.iter)
         
         dim.para  <- dim(post.samples[[i]][[1]]) 
@@ -612,7 +615,7 @@ function(
           para.list <- c("b","d", "sigma")}
       }
       para.list <- c(para.list, "ypred") # "phi" 
-      print(para.list)
+      #print(para.list)
       post.samples <- coda.samples(model, para.list, thin=n.thin, n.iter=n.iter)
 
       
@@ -693,39 +696,93 @@ function(
   #phicol <-  which(substr(colnames(post.samples.raw[[1]]),1,3)=="phi")
   #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(phicol[1]-1)]),
   #                   mcmc(post.samples.raw[[2]][-(1:nburn),1:(phicol[1]-1)]))
-  coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
-                     mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
-                     
-  # get predicted value
-  pred1 <- post.samples.raw[[1]][-(1:nburn),ypredcol]
-  pred2 <- post.samples.raw[[2]][-(1:nburn),ypredcol] 
-  ypred <- mcmc.list(mcmc(pred1), mcmc(pred2))
-
+  
+  coeff<- list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]))
+  ypred<- list(mcmc(post.samples.raw[[1]][-(1:nburn),ypredcol]))
+  
   # residuals
   yobs <- c(y); 
   howmany <- length(yobs)
-  names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
-  resid1 <- yobs-pred1; colnames(resid1)<- names
-  resid2 <- yobs-pred2; colnames(resid2)<- names
-  resid <- mcmc.list(mcmc(resid1), mcmc(resid2))
+  res.names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
+  resid <- yobs-ypred[[1]]; 
+  colnames(resid)<- res.names
+  resid <- list(resid)
   
   # standardized residuals
-  names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
-  resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
-  resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
-  resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
+  rstd.names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
+  resid.std <- resid[[1]]/apply(resid[[1]],2,sd); 
+  colnames(resid.std)<- rstd.names
+  resid.std <- list(resid.std)
+  
+  for(k in 2:n.chain) {
+    coeff<- c(coeff,k)
+    coeff[[k]]<- mcmc(post.samples.raw[[k]][-(1:nburn),1:(ypredcol[1]-1)])
+    
+    ypred<- c(ypred,k)
+    ypred[[k]]<- mcmc(post.samples.raw[[k]][-(1:nburn),ypredcol])
+    
+    resid<- c(resid,k)
+    tmp<- yobs- post.samples.raw[[k]][-(1:nburn),ypredcol]
+    colnames(tmp)<- res.names
+    resid[[k]] <- mcmc(tmp)
+    
+    resid.std<- c(resid.std,k)
+    tmp <- resid[[k]]/apply(resid[[k]],2,sd); 
+    colnames(tmp)<- rstd.names
+    resid.std[[k]] <- mcmc(tmp)}
+  
+  coeff<- mcmc.list(coeff)
+  ypred<- mcmc.list(ypred)
+  resid<- mcmc.list(resid)
+  resid.std<- mcmc.list(resid.std)
+ 
+  #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
+  #                   mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
+                     
+  # pred1 <- post.samples.raw[[1]][-(1:nburn),ypredcol]
+  # pred2 <- post.samples.raw[[2]][-(1:nburn),ypredcol] 
+  # ypred <- mcmc.list(mcmc(pred1), mcmc(pred2))
+
+  # yobs <- c(y); 
+  # howmany <- length(yobs)
+  # names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
+  #resid1 <- yobs-pred1; colnames(resid1)<- names
+  #resid2 <- yobs-pred2; colnames(resid2)<- names
+  #resid <- mcmc.list(mcmc(resid1), mcmc(resid2))
+  
+  # standardized residuals
+  # names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
+  # resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
+  # resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
+  # resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
+  
+  
+  for(i in 1:n.chain){
+    colnames(coeff[[i]])[1:p.xmu] <- colnames(Xbeta.mean)
+    colnames(coeff[[i]])[1:p.xsum+p.xmu] <- colnames(Xbeta.sum)
+    if(!is.null(X0) & is.null(X1)) 
+      colnames(coeff[[i]])[1:p.x0+p.xmu+p.xsum] <- colnames(X0)
+    if(!is.null(X0) & is.null(X0))
+      colnames(coeff[[i]])[1:p.x1+p.xmu+p.xsum] <- colnames(X1)
+    if(!is.null(X0) & !is.null(X0)){
+      colnames(coeff[[i]])[1:p.x0+p.xmu+p.xsum] <- colnames(X0)
+      colnames(coeff[[i]])[1:p.x1+p.xmu+p.xsum+p.x0] <- colnames(X1)
+    }
+  }
   
   print("NOTE: in the header of Markov Chain Monte Carlo (MCMC) output of")
-  print("parameters (coeff), predicted values (ypred), residuals (resid),")
-  print("and standardized residuals (resid.std), *Start, End, Thinning Interval*")
-  print("values are after the initially burning and thinning periods")
-  print("specified by the user. For example, n.iter = 151, n.thin = 2, n.burn=1,")
-  print("then MCMC header of the *coeff* output would be as follows") 
+  print("parameters (coeff), predicted values (ypred), residuals (resid), and")
+  print("standardized residuals (resid.std), *Start, End, Thinning Interval*")
+  print("values are after the initial burning and thinning periods specified")
+  print("by the user. For example, n.iter = 151, n.thin = 2, n.burn=1,")
+  print("then MCMC header of the *coeff* output would read as follows") 
+  print("-----------------------------------------")
   print("Markov Chain Monte Carlo (MCMC) output:")
   print("Start = 1")
   print("End = 75")
   print("Thinning interval = 1")
   
+ 
   return(list(model= model.format, MCMC.model= model, 
               Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= X0, Xb1=X1, 
               coeff= coeff, ypred= ypred, yobs= yobs, 

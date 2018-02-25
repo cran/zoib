@@ -192,10 +192,10 @@ Fang Liu (\email{fang.liu.131@nd.edu})
 }
 
 \examples{
-  #\dontrun{
-    # refer to data sets GasolineYield, BiRepeated, and AlcoholUse in package zoib
-    # for examples on fixed effect models, mixed effects models, joint modeling 
-    # of bivariate beta variables with repeated measures, and modelling clustered 
-    # beta variables with inflation at 0 using zoib
-  #}
+  \dontrun{
+    #refer to data sets GasolineYield, BiRepeated, and AlcoholUse in package zoib
+    #for examples on fixed effect models, mixed effects models, joint modeling 
+    #of bivariate beta variables with repeated measures, and modelling clustered 
+    #beta variables with inflation at 0 using zoib
+  }
 }

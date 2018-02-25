@@ -1,5 +1,5 @@
-103bd41afccf9f4d4918d6cf149b5342 *DESCRIPTION
-7b1e7db9ab69c1afd021910661e5112d *NAMESPACE
+c47c73b8472a4106c739d28943dddb74 *DESCRIPTION
+5ef512cfe8067fa4e7c3ea07018ca308 *NAMESPACE
 3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
 148148a33cd052f3a336d002448063d3 *R/fixed0.R
@@ -14,6 +14,7 @@ a9f2ff3688624077fcfb3e403bda45b4 *R/joint.2z0.R
 6dfbc96298fe3aa73d6111878743433b *R/joint.2z01.R
 e467448a66f1074860dc84ef5a461a23 *R/joint.2z1.R
 02ac4a91388c62bae4f8ff0e8f4a79b6 *R/paraplot.R
+afe1427676e2a7a6cbdd1f5f19b2f559 *R/pred.zoib.R
 1f95704b11a39c1088bdeace2150c708 *R/sep.1z.R
 9a62ffc5fb385af241cf8ee12b492e82 *R/sep.1z0.R
 ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
@@ -22,7 +23,7 @@ ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
 6698c856c9c0f71718812b763c19933f *R/sep.2z0.R
 0797b4b28f95b8b698d940e62c108cb7 *R/sep.2z01.R
 d167371c4816c092d564b78853c8045b *R/sep.2z1.R
-5b9ac4eb6bb2fd5c3bc26b8e18aabb1e *R/zoib.R
+b15526bfd46b3dcde1c830255eee54c1 *R/zoib.R
 c47c16e512e561667db0a00ee3e63e93 *data/AlcoholUse.rda
 6069434c7371e055b4db675eb116e405 *data/BiRepeated.rda
 1e121d64e99a1a3f21d205a6283b6385 *data/GasolineYield.rda
@@ -63,6 +64,7 @@ a928615caac346266cff68e73fc4d73d *man/joint.2z.Rd
 b13ac523cdcc1354873bc11e60ea8ca2 *man/joint.2z01.Rd
 6b35ee24c5fe17ef9c0bcecfa9476062 *man/joint.2z1.Rd
 a62c1b3005af690a0beedfe4914b83d0 *man/paraplot.Rd
+bab2ead6a7d26f36a3e17b9946844d8d *man/pred.zoib.Rd
 b101d1442c719ca992ee578db0e121b6 *man/sep.1z.Rd
 8c896549ac13de077eaeaa4a65fe3584 *man/sep.1z0.Rd
 d3bba5e61725194aaec1887f38e80c2d *man/sep.1z01.Rd
@@ -71,7 +73,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-207e5343725341d566754be3bb3b8b14 *man/zoib-package.Rd
-a10041459b7fa2704c6f2a15585cdffd *man/zoib.Rd
-3075f42857f61233fa5b933cf0ac05e8 *tests/test1.R
+51d81af979bf65cd6e6b449f358cde6c *man/zoib-package.Rd
+8766308b35d8b95bcdc17509c28860a7 *man/zoib.Rd
+80638adac784dae06c73341349cecc20 *tests/test1.R
 bfdcf6382f7cd682b879c257c3c966df *tests/test2.R
