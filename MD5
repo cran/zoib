@@ -1,4 +1,4 @@
-c47c73b8472a4106c739d28943dddb74 *DESCRIPTION
+5cf6f0cf71d80b4c3df30c215ce9c832 *DESCRIPTION
 5ef512cfe8067fa4e7c3ea07018ca308 *NAMESPACE
 3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
@@ -9,7 +9,7 @@ b3328b12b7394b5928b78272472e6348 *R/fixed01.R
 1e343074ddfefcb19baff873f16af285 *R/joint.1z0.R
 be5c2323571daf79d9d13247205ebe9e *R/joint.1z01.R
 c22a73d1dab65edd54cc5d2c0c01d9cb *R/joint.1z1.R
-b26aa3be76b378a78363dc61f5a38f66 *R/joint.2z.R
+2a8ac7a0f7f49911e77a27ecde99f70b *R/joint.2z.R
 a9f2ff3688624077fcfb3e403bda45b4 *R/joint.2z0.R
 6dfbc96298fe3aa73d6111878743433b *R/joint.2z01.R
 e467448a66f1074860dc84ef5a461a23 *R/joint.2z1.R
@@ -23,7 +23,7 @@ ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
 6698c856c9c0f71718812b763c19933f *R/sep.2z0.R
 0797b4b28f95b8b698d940e62c108cb7 *R/sep.2z01.R
 d167371c4816c092d564b78853c8045b *R/sep.2z1.R
-b15526bfd46b3dcde1c830255eee54c1 *R/zoib.R
+a26a0d2052b450f5f2b1e0529dfee3d6 *R/zoib.R
 c47c16e512e561667db0a00ee3e63e93 *data/AlcoholUse.rda
 6069434c7371e055b4db675eb116e405 *data/BiRepeated.rda
 1e121d64e99a1a3f21d205a6283b6385 *data/GasolineYield.rda
@@ -35,7 +35,7 @@ f3eb47b06bf2f46eec7250800abb7815 *inst/bugs/fixed1.bug
 26b0e3f031d4b40efc736d6b850bb44d *inst/bugs/joint_1z0.bug
 48a07c77e4e9116d39641cbfe4978f7e *inst/bugs/joint_1z01.bug
 7e3b78aa716a0d3e57055e2a50832348 *inst/bugs/joint_1z1.bug
-2d51f43281d4d90a4a067011f9eeae5c *inst/bugs/joint_2z.bug
+ca00a5a6e0ed7266786878ac89d95e33 *inst/bugs/joint_2z.bug
 b85ddfecb14bd1647d6d6f7b20bfa5c2 *inst/bugs/joint_2z0.bug
 90a9b291e27c1b4c1d049621168b6922 *inst/bugs/joint_2z01.bug
 4f894b9256da972fc17d3bc63c4adf5a *inst/bugs/joint_2z1.bug
@@ -48,8 +48,8 @@ c45953f01ecc68cd3f4451913e72c838 *inst/bugs/sep_2z.bug
 62911484d074127e1f9216a65587f178 *inst/bugs/sep_2z01.bug
 9e9653f5887609832a05902aa996ac38 *inst/bugs/sep_2z1.bug
 b01e5a67f3e2c32acf7ffd252a0d38c4 *man/AlcoholUse.Rd
-85caca71d06910ac2de6df54d4ea44e8 *man/BiRepeated.Rd
-5e8e4fbe5e7398d9fe679d1bf5d9385a *man/GasolineYield.Rd
+49be793e497f0fcfe080e5499e325cb9 *man/BiRepeated.Rd
+a61b04c7edeaafd9dc400636b80b0693 *man/GasolineYield.Rd
 2e9055b46247f950b4d164d960dcf31c *man/check.psrf.Rd
 ae0940977921457fd869d9fb5077e7c1 *man/fixed.Rd
 91218e95a6c0b3e13f06fb180607e2c1 *man/fixed0.Rd
@@ -73,7 +73,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-51d81af979bf65cd6e6b449f358cde6c *man/zoib-package.Rd
-8766308b35d8b95bcdc17509c28860a7 *man/zoib.Rd
-80638adac784dae06c73341349cecc20 *tests/test1.R
+eab76b2b2eecfd88ce62d59da31af5fc *man/zoib-package.Rd
+510742fbfa66212588ee75cbcbe2323d *man/zoib.Rd
+05f1e32205f9a12bd733c4e7a4173c6f *tests/test1.R
 bfdcf6382f7cd682b879c257c3c966df *tests/test2.R

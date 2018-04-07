@@ -155,7 +155,6 @@ function(
   n <- nrow(y)
   q <- ncol(y)
   
-  
   # link choice
   link <- matrix(0,3,3)
   
@@ -670,26 +669,29 @@ function(
   
   Xbeta.mean <- xmu
   Xbeta.sum <- xsum
-  X0 <- NULL
-  X1 <- NULL
-  if(nterm[2L]==5L){
-    X0 <- x0
-    X1 <- x1
-  }
-  else if(nterm[2L]==4L){
-    if(random==0){
+  if(0)
+    {
+    X0 <- NULL
+    X1 <- NULL
+    if(nterm[2L]==5L){
       X0 <- x0
       X1 <- x1
-    } 
-    else{
-      if(any(one.inflation) & all(!zero.inflation)) X0 <- x0
-      else if(any(zero.inflation) & !all(one.inflation)) X1 <-x1
     }
+    else if(nterm[2L]==4L){
+      if(random==0){
+        X0 <- x0
+        X1 <- x1
+      } 
+      else{
+        if(any(one.inflation) & all(!zero.inflation)) X0 <- x0
+        else if(any(zero.inflation) & !all(one.inflation)) X1 <-x1
+      }
+    }
+    else if(nterm[2L]==3L){
+        if(random == 0){
+          if(any(zero.inflation) & !all(one.inflation)) X1 <-  x1
+        }}
   }
-  else if(nterm[2L]==3L){
-      if(random == 0){
-        if(any(zero.inflation) & !all(one.inflation)) X1 <-  x1
-      }}
 
   nburn <- n.burn/n.thin
   ypredcol <-  which(substr(colnames(post.samples.raw[[1]]),1,5)=="ypred")
@@ -755,21 +757,44 @@ function(
   # resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
   # resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
   # resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
-  
-  
-  for(i in 1:n.chain){
-    colnames(coeff[[i]])[1:p.xmu] <- colnames(Xbeta.mean)
-    colnames(coeff[[i]])[1:p.xsum+p.xmu] <- colnames(Xbeta.sum)
-    if(!is.null(X0) & is.null(X1)) 
-      colnames(coeff[[i]])[1:p.x0+p.xmu+p.xsum] <- colnames(X0)
-    if(!is.null(X0) & is.null(X0))
-      colnames(coeff[[i]])[1:p.x1+p.xmu+p.xsum] <- colnames(X1)
-    if(!is.null(X0) & !is.null(X0)){
-      colnames(coeff[[i]])[1:p.x0+p.xmu+p.xsum] <- colnames(X0)
-      colnames(coeff[[i]])[1:p.x1+p.xmu+p.xsum+p.x0] <- colnames(X1)
-    }
+
+  orinames <- colnames(coeff[[1]])
+  newnames <- orinames
+  n.orinames <- length(orinames)
+ 
+  tmp<- which(substr(orinames,1,1)=='d')
+  newname<- colnames(Xbeta.sum); newname<-rep(newname, q)
+  for(k in 1:length(tmp)){
+    #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],2,nchar(orinames[tmp[k]])),sep="")
+    newnames[tmp[k]]<- newname[k]
   }
-  
+  tmp<- which(substr(orinames,1,2)=='b[')
+  newname<- colnames(Xbeta.mean); newname<-rep(newname, q)
+  for(k in 1:length(tmp)){
+    #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],2,nchar(orinames[tmp[k]])),sep="")
+    newnames[tmp[k]]<- newname[k]
+  }    
+  tmp0<- any(substr(orinames,1,2)=='b0');
+  if(tmp0){
+    tmp<- which(substr(orinames,1,2)=='b0'); 
+    newname<- colnames(x0); newname<-rep(newname, q)
+    for(k in 1:length(tmp)){
+      #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],3,nchar(orinames[tmp[k]])),sep="")
+      newnames[tmp[k]]<- newname[k]
+
+    }}
+  tmp1<- any(substr(orinames,1,2)=='b1');
+  if(tmp1){
+    tmp<- which(substr(orinames,1,2)=='b1')
+    newname<- colnames(x1); newname<-rep(newname, q)
+    for(k in 1:length(tmp)){
+      #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],3,nchar(orinames[tmp[k]])),sep="")
+      newnames[tmp[k]]<- newname[k]
+    }}
+
+  for(i in 1:n.chain){
+    colnames(coeff[[i]])=newnames
+  }
   print("NOTE: in the header of Markov Chain Monte Carlo (MCMC) output of")
   print("parameters (coeff), predicted values (ypred), residuals (resid), and")
   print("standardized residuals (resid.std), *Start, End, Thinning Interval*")
@@ -784,7 +809,7 @@ function(
   
  
   return(list(model= model.format, MCMC.model= model, 
-              Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= X0, Xb1=X1, 
+              Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= x0, Xb1=x1, 
               coeff= coeff, ypred= ypred, yobs= yobs, 
               resid= resid, resid.std= resid.std))
 }

@@ -96,7 +96,7 @@ model
   for(i in 1:nz0){   
     sigma.VC1[i] ~ dunif(0, hyper2)       ##### uniform #####   
     
-    t[i] ~ dt(0, pow(hyper2,-2), 1);           ##### half_Cauchy #####
+    t[i] ~ dt(0, pow(hyper2,-2), 1);      ##### half_Cauchy #####
     sigma.VC2[i] <- abs(t[i])
     
     for(j in (cumm[i]+1):(cumm[i]+m[i])) {

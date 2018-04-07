@@ -70,7 +70,7 @@ The Gasoline Yields Data is a subset of the data GasolineYield in R package "bet
   # check convergence on the regression coefficients
   traceplot(sample2)
   autocorr.plot(sample2) 
-  check.psrf(coeff)
+  check.psrf(sample2)
   
   # plot posterior mean of y vs. observed y to check on goodness of fit.
   ypred = rbind(eg.random$ypred[[1]],eg.random$ypred[[2]])

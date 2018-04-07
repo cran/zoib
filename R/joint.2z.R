@@ -141,7 +141,7 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
       if(!pd) {
         notuse <- TRUE
         warning('the specified initial correlation matrix is not positive definite')
-        warning('Internal initial value are used')
+        warning('Internal initial values are used')
         break}
       else{
         if(size==2) {
@@ -159,7 +159,6 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum,
        inits.internal[[i]][[17]] <- runif(1, lower, upper)
     }
   }}
-  
   op<- system.file("bugs", "joint_2z.bug", package="zoib") 
   model <- jags.model(op,data=dataIn, n.adapt=0, inits=inits.internal,n.chains=n.chain)  
   return(model)

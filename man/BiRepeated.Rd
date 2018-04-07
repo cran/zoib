@@ -28,7 +28,7 @@ BiRepeated is a simulated data set with bi-Beta variables y1 and y2 on 200 indep
   \dontrun{
   library(zoib)
   data("BiRepeated", package = "zoib")
-  eg2 <- zoib(y1|y2 ~ x|1|x, data= BiRepeated, random=1, 
+  eg2 <- zoib(y1|y2 ~ x|1|x, data= BiRepeated, random=1,n.response=2,
               EUID= BiRepeated$id, joint=TRUE,zero.inflation = FALSE,
               one.inflation = FALSE, prior.Sigma = "VC.unif",  			
               n.iter=7000,n.thin=25,n.burn=2000)
