@@ -16,7 +16,7 @@ if(0){
 eg2 <- zoib(y1 ~x|1|x, data= BiRepeated, n.response=1,
             random=1, EUID= BiRepeated$id, joint=FALSE,
             zero.inflation = FALSE, one.inflation = FALSE,  			
-            prior.Sigma = "UN.halfcauchy", n.iter=600, n.thin=5, n.burn=10,            
+            prior.Sigma = "UN.halfcauchy", n.iter=60, n.thin=5, n.burn=10,            
             inits=list(list(b0=NULL,b1=NULL,b=matrix(c(-1.3,-2.6),2,1),
                             d=matrix(1.75,1,1),sigma=c(0.16,0.25),R=c(1,0.12,1)),
                        list(b0=NULL,b1=NULL,b=matrix(c(-0.7,-1.4),2,1),

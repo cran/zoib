@@ -8,7 +8,7 @@ eg.fixed <- zoib(yield ~ temp + as.factor(batch)| 1, data=GasolineYield,
                  zero.inflation = FALSE, one.inflation = FALSE,
                  n.iter = 51, n.thin = 2, n.burn=1, seeds=c(1,2,3),n.chain=3)
 sample1 <- eg.fixed$coeff
-
+#dic.samples(eg.fixed $MCMC.model, n.iter=51,thin=2,n.burn=1)
 
 # zoib: random
 eg.random <- zoib(yield ~ temp | 1 | 1, data=GasolineYield,

@@ -47,20 +47,20 @@ pred.zoib<- function(object, xnew, summary=TRUE)
       if(!is.null(x0.1) & is.null(x1.1)){
         p.x0 <- ncol(x0.1)   
         b0 <- t(object$coeff[[k]][,1:p.x0+p.xsum+p.xmu])
-        ypred[[k]][i,]<- exp(xmu[i,]*b)/(1+exp(xmu[i,]*b))/(1+exp(x0[i,]*b0))
+        ypred[[k]][i,]<- exp(xmu[i,]%*%b)/(1+exp(xmu[i,]%*%b))/(1+exp(x0[i,]%*%b0))
       }
       if(!is.null(x1.1)& is.null(x0.1)){
         p.x1 <-ncol(x1.1)     
         b1 <- object$coeff[[k]][,1:p.x1+p.xsum+p.xmu] 
-        ypred[[k]][i,]<- (exp(xmu[i,]*b)/(1+exp(xmu[i,]*b))+exp(x1[i,]*b1))/(1+exp(x1[i,]*b1))
+        ypred[[k]][i,]<- (exp(xmu[i,]%*%b)/(1+exp(xmu[i,]%*%b))+exp(x1[i,]%*%b1))/(1+exp(x1[i,]%*%b1))
       }
       if(!is.null(x0.1) & !is.null(x1.1)){
         p.x0 <- ncol(x0.1)   
         b0 <- t(object$coeff[[k]][,1:p.x0+p.xsum+p.xmu])
         p.x1 <-ncol(x1.1)     
         b1 <- t(object$coeff[[k]][,1:p.x1+p.xmu+p.xsum+p.x0])
-        ypred[[k]][i,]<- ( exp(xmu[i,]*b)/(1+exp(xmu[i,]*b))+
-                             exp(x1[i,]*b1) )/((1+exp(x0[i,]*b0))*(1+exp(x1[i,]*b1)))
+        ypred[[k]][i,]<- ( exp(xmu[i,]%*%b)/(1+exp(xmu[i,]%*%b))+
+                             exp(x1[i,]%*%b1) )/((1+exp(x0[i,]%*%b0))*(1+exp(x1[i,]%*%b1)))
       }
     }
   }
