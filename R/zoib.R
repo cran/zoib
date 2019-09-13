@@ -277,6 +277,7 @@ function(
 
       dim.para  <- dim(post.samples[[i]][[1]]) 
       name.para <- colnames(post.samples[[i]][[1]])
+      #print(name.para) b first, followed by b0, b1, and d.
       
       post.samples.raw <- post.samples
       
@@ -806,8 +807,10 @@ function(
   print("Start = 1")
   print("End = 75")
   print("Thinning interval = 1")
-  
- 
+  print("                                         ")
+  print("                                         ")
+  print("Coefficients are presented in the order of b, ")
+  print("b0 (if zero.inflation=TRUE), b1 (if one.inflation=TRUE), and d")
   return(list(model= model.format, MCMC.model= model, 
               Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= x0, Xb1=x1, 
               coeff= coeff, ypred= ypred, yobs= yobs, 

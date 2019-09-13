@@ -12,8 +12,8 @@ beta regression and zero/one inflated beta regression on data with [0,1]-bounded
 \tabular{ll}{
 Package: \tab zoib\cr
 Type: \tab Package\cr
-Version: \tab 1.5.2\cr
-Date: \tab 2019-08-14\cr
+Version: \tab 1.5.3\cr
+Date: \tab 2019-09-12\cr
 License: \tab GPL (>= 3)\cr
 }
 }

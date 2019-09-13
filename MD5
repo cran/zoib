@@ -1,4 +1,4 @@
-ad6bfb503f7c8e7986f5ddd95fc7305a *DESCRIPTION
+583106f58a4ea5ff2936e1ed58730a55 *DESCRIPTION
 5ef512cfe8067fa4e7c3ea07018ca308 *NAMESPACE
 3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
@@ -14,7 +14,7 @@ a9f2ff3688624077fcfb3e403bda45b4 *R/joint.2z0.R
 6dfbc96298fe3aa73d6111878743433b *R/joint.2z01.R
 e467448a66f1074860dc84ef5a461a23 *R/joint.2z1.R
 02ac4a91388c62bae4f8ff0e8f4a79b6 *R/paraplot.R
-326a1ee23b4b641c233aea60bb8e666f *R/pred.zoib.R
+8936635c74e3c98a2bcd8671ab3f8399 *R/pred.zoib.R
 1f95704b11a39c1088bdeace2150c708 *R/sep.1z.R
 9a62ffc5fb385af241cf8ee12b492e82 *R/sep.1z0.R
 ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
@@ -23,7 +23,7 @@ ec6d2bb9012f3b4c4dced6fcf8f71e4e *R/sep.1z01.R
 6698c856c9c0f71718812b763c19933f *R/sep.2z0.R
 0797b4b28f95b8b698d940e62c108cb7 *R/sep.2z01.R
 d167371c4816c092d564b78853c8045b *R/sep.2z1.R
-a26a0d2052b450f5f2b1e0529dfee3d6 *R/zoib.R
+5cd55dd58daca8aca531a757f6a94c6a *R/zoib.R
 c47c16e512e561667db0a00ee3e63e93 *data/AlcoholUse.rda
 6069434c7371e055b4db675eb116e405 *data/BiRepeated.rda
 1e121d64e99a1a3f21d205a6283b6385 *data/GasolineYield.rda
@@ -73,7 +73,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-837814d93416f7981cd8c3f64c8a3513 *man/zoib-package.Rd
+a2f793e011e7ebdd8c53b7aac3a10016 *man/zoib-package.Rd
 510742fbfa66212588ee75cbcbe2323d *man/zoib.Rd
 e7066fd502a274d8b3d94fce2b8c1099 *tests/test1.R
 43d6bb05c034ad2139a427c4cd3eff99 *tests/test2.R
