@@ -42,6 +42,7 @@ function(y, n, xmu.1,p.xmu, xsum.1,p.xsum, x0.1,p.x0, x1.1,p.x1,
       # to ensure R is Positive definite
       rho3 <- runif(1, rho1*rho2 - sqrt((1-rho1^2)*(1-rho2^2)), 
                     rho1*rho2 + sqrt((1-rho1^2)*(1-rho2^2)))
+
       return(
         list("tmp1" = rnorm(1,0,0.1),
              "tmp2" = rnorm(1,0,0.1),

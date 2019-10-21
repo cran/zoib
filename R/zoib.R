@@ -412,14 +412,14 @@ function(
         if(nz0>1){ 
           if(one.inflation[i] & zero.inflation[i]){ 
             model[[i]]<- sep.2z01(y[,i],n, xmu.1, p.xmu, xsum.1,p.xsum, x0.1,p.x0, x1.1,p.x1, 
-                                  zdummy,qz,nz0,m, rid,  nEU, prior1[,,i], prior2, prior.beta, 
+                                  zdummy,qz,nz0,m, rid,  EUID1, nEU, prior1[,,i], prior2, prior.beta, 
                                   prior.Sigma, prec.int[i,], prec.DN[i,], lambda.L1[i,],
                                   lambda.L2[i,],lambda.ARD[i,], scale.unif, scale.halfcauchy,link, 
                                   n.chain, inits, seeds) 
             para.list <- c("b","d","b0","b1","Sigma")}
           else if(!one.inflation[i] & zero.inflation[i]){ 
             model[[i]]<- sep.2z0(y[,i],n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0, zdummy, 
-                                 qz,nz0, m, rid,  nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
+                                 qz,nz0, m, rid,  EUID1, nEU, prior1[,,i], prior2, prior.beta, prior.Sigma,
                                  prec.int[i,], prec.DN[i,], lambda.L1[i,],
                                  lambda.L2[i,],lambda.ARD[i,],scale.unif, scale.halfcauchy,link, 
                                  n.chain, inits, seeds)
