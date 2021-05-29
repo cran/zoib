@@ -17,4 +17,3 @@ eg.random <- zoib(yield ~ temp | 1 | 1, data=GasolineYield,
                   n.iter=41, n.thin=2, n.burn=1)
 sample2 <- eg.random$coeff
 
-

@@ -1,7 +1,6 @@
 #useDynLib(zoib)
 import(coda)
 import(rjags)
-import(matrixcalc)
 import(Formula)
 import(abind)
 importFrom("graphics", "axis", "boxplot", "legend", "mtext", "par","plot", "points", "segments", "text")

@@ -1,10 +1,11 @@
-f2312deea272b4f417006fd8bc4ed8b3 *DESCRIPTION
-5ef512cfe8067fa4e7c3ea07018ca308 *NAMESPACE
+d6cdb494e8ce8c4c473f36f9919a6161 *DESCRIPTION
+c521582433dc2e354db638d63434bb82 *NAMESPACE
 3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
 148148a33cd052f3a336d002448063d3 *R/fixed0.R
 b3328b12b7394b5928b78272472e6348 *R/fixed01.R
 3d1bf9134e4960bb7dbb146d1e4bb0cb *R/fixed1.R
+f49c43dace828a4ea92788ca6a4c33ed *R/is.positive.definite.R
 36cfc2ee6177cfdbb91e4db08cdc29f1 *R/joint.1z.R
 1e343074ddfefcb19baff873f16af285 *R/joint.1z0.R
 be5c2323571daf79d9d13247205ebe9e *R/joint.1z01.R
@@ -73,7 +74,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-b57cae40ba6acefd800e3f52bca69bdf *man/zoib-package.Rd
+c72c51d85acf2d7009754cf81b83b8cd *man/zoib-package.Rd
 510742fbfa66212588ee75cbcbe2323d *man/zoib.Rd
-e7066fd502a274d8b3d94fce2b8c1099 *tests/test1.R
+44f4e560c827f9936510183aa16ef217 *tests/test1.R
 43d6bb05c034ad2139a427c4cd3eff99 *tests/test2.R
