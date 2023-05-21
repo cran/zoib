@@ -96,7 +96,7 @@ model
     
   
     tmp3[j]~ dnorm(0, hyper[j,3,1]) 
-    b0[1,j] <- inflate0*tmp3[j]; 
+    b0[1,j] <- inflate0[j]*tmp3[j]; 
     
     for(i in 1:(p.x0-1))
   	{
@@ -117,7 +117,7 @@ model
 
 
     tmp4[j]~ dnorm(0, hyper[j,4,1])
-    b1[1,j] <- inflate1*tmp4[j];    
+    b1[1,j] <- inflate1[j]*tmp4[j];    
     for(i in 1:(p.x1-1))
   	{
   		b1.tmp[i,j,1] ~ dnorm(0, hyper[j,4,2]) 

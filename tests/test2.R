@@ -1,10 +1,10 @@
 # Example 2:  bivariate beta with repeated measures
 library(zoib)
 data("BiRepeated", package = "zoib")
-
-eg2 <- zoib(y1|y2 ~ x|1|x, data= BiRepeated, n.response=2,
-            random=1, EUID= BiRepeated$id,
-            zero.inflation = FALSE, one.inflation = FALSE,				
+d= BiRepeated[1:100,]
+eg2 <- zoib(y1|y2 ~ x|1|x, data= d, n.response=2,
+            random=1, EUID= d$id,
+            zero.inflation = c(FALSE,FALSE), one.inflation = c(FALSE,FALSE),				
             prior.Sigma = "VC.unif", n.iter=5, n.thin=1, n.burn=1)
 coeff<- eg2$coeff
 ypred<- eg2$ypred

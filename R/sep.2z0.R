@@ -6,8 +6,9 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
                     scale.unif, scale.halft, link, n.chain, inits, seed) 
 {
   dataIn <- vector("list",22)
-  names(dataIn) <- c("n","y","xmu.1","p.xmu","xsum.1","p.xsum","x0.1",
-                     "p.x0","z","nz0","qz","m","cumm", "zero","link",
+  names(dataIn) <- c("n","y","xmu.1","p.xmu","xsum.1",
+                     "p.xsum","x0.1", "p.x0","z","nz0",
+                     "qz", "m","cumm", "zero","link",
                      "hyper","prior1","prior2","rid","EUID","nEU","hyper2")
   dataIn[[1]] <- n      
   dataIn[[2]] <- y

@@ -6,9 +6,11 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
                       scale.unif, scale.halft, link, n.chain, inits, seed) 
 { 
   dataIn <- vector("list",24)
-  dataIn.name <- c("y","n","q","xmu.1","p.xmu", "xsum.1","p.xsum","x0.1",
-                   "p.x0","inflate0","z","nz0","qz","m","zero","cumm","link",
-                   "hyper","prior1","prior2","rid","EUID","nEU","hyper2")
+  dataIn.name <- c("y","n","q","xmu.1","p.xmu", 
+                   "xsum.1","p.xsum","x0.1","p.x0","inflate0",
+                   "z","nz0","qz","m","zero",
+                   "cumm","link","hyper","prior1","prior2",
+                   "rid","EUID","nEU","hyper2")
   names(dataIn)<- dataIn.name  
   dataIn[[1]] <- as.matrix(y)
   dataIn[[2]] <- n      
@@ -24,8 +26,8 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
   dataIn[[12]]<- nz0
   dataIn[[13]]<- qz
   dataIn[[14]]<- m
-  dataIn[[15]]<- c(0,cumsum(m[-nz0]))  
-  dataIn[[16]]<- matrix(0,n,q)   
+  dataIn[[15]]<- matrix(0,n,q)  
+  dataIn[[16]]<- c(0,cumsum(m[-nz0]))  
   dataIn[[17]]<- link
   dataIn[[18]]<- abind(prec.int,prec.DN,lambda.L1,lambda.L2,lambda.ARD,along=3)    
   dataIn[[19]] <- prior1
@@ -47,21 +49,21 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
              "tmp2" = rnorm(q,0,0.1),
              "tmp3" = rnorm(q,0,0.1),
              
-             "b.tmp"  = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
-             "d.tmp"  = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
-             "b0.tmp" = matrix(rnorm((p.x0-1)*4,0,0.1), ncol=4),
+             "b.tmp" = array(rnorm((p.xmu-1)*4*q,0,0.1), c((p.xmu-1),q,4)),
+             "d.tmp" = array(rnorm((p.xsum-1)*4*q,0,0.1),c((p.xsum-1),q,4)),
+             "b0.tmp"= array(rnorm((p.x0-1)*4*q,0,0.1),  c((p.x0-1),q,4)),
              
-             "sigmab.L1" = runif((p.xmu-1),0,2), 
-             "sigmad.L1" = runif((p.xsum-1),0,2), 
-             "sigmab0.L1" = runif((p.x0-1),0,2), 
+             "sigmab.L1" =  matrix(runif((p.xmu-1)*q,0,2),(p.xmu-1),q), 
+             "sigmad.L1" =  matrix(runif((p.xsum-1)*q,0,2),(p.xsum-1),q),  
+             "sigmab0.L1" = matrix(runif((p.x0-1)*q,0,2),(p.x0-1),q),  
              
-             "taub.ARD" = runif((p.xmu-1),0,2), 
-             "taud.ARD" = runif((p.xsum-1),0,2), 
-             "taub0.ARD" = runif((p.x0-1),0,2), 
+             "taub.ARD" =  matrix(runif((p.xmu-1)*q,0,2), (p.xmu-1),q), 
+             "taud.ARD" =  matrix(runif((p.xsum-1)*q,0,2),(p.xsum-1),q),  
+             "taub0.ARD" = matrix(runif((p.x0-1)*q,0 ,2),(p.x0-1),q),  
              
-             "taub.L2" = runif(1,0,2), 
-             "taud.L2" = runif(1,0,2),
-             "taub0.L2" = runif(1,0,2),
+             "taub.L2" =  runif(q,0,2), 
+             "taud.L2" =  runif(q,0,2),
+             "taub0.L2" = runif(q,0,2),
              
              "sigma.VC1" = runif(nz0,0.25,2),
              "t" = runif(nz0,0.25,1),         
@@ -85,21 +87,21 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
            "tmp2" = rnorm(q,0,0.1),
            "tmp3" = rnorm(q,0,0.1),
            
-           "b.tmp"  = matrix(rnorm((p.xmu-1)*4,0,0.1),ncol=4),
-           "d.tmp"  = matrix(rnorm((p.xsum-1)*4,0,0.1),ncol=4),
-           "b0.tmp" = matrix(rnorm((p.x0-1)*4,0,0.1), ncol=4),
+           "b.tmp" = array(rnorm((p.xmu-1)*4*q,0,0.1), c((p.xmu-1),q,4)),
+           "d.tmp" = array(rnorm((p.xsum-1)*4*q,0,0.1),c((p.xsum-1),q,4)),
+           "b0.tmp"= array(rnorm((p.x0-1)*4*q,0,0.1),  c((p.x0-1),q,4)),
            
-           "sigmab.L1" = runif((p.xmu-1),0,2), 
-           "sigmad.L1" = runif((p.xsum-1),0,2), 
-           "sigmab0.L1" = runif((p.x0-1),0,2), 
+           "sigmab.L1" =  matrix(runif((p.xmu-1)*q,0,2),(p.xmu-1),q), 
+           "sigmad.L1" =  matrix(runif((p.xsum-1)*q,0,2),(p.xsum-1),q),  
+           "sigmab0.L1" = matrix(runif((p.x0-1)*q,0,2),(p.x0-1),q),  
            
-           "taub.ARD" = runif((p.xmu-1),0,2), 
-           "taud.ARD" = runif((p.xsum-1),0,2), 
-           "taub0.ARD" = runif((p.x0-1),0,2), 
+           "taub.ARD" =  matrix(runif((p.xmu-1)*q,0,2), (p.xmu-1),q), 
+           "taud.ARD" =  matrix(runif((p.xsum-1)*q,0,2),(p.xsum-1),q),  
+           "taub0.ARD" = matrix(runif((p.x0-1)*q,0 ,2),(p.x0-1),q),  
            
-           "taub.L2" = runif(1,0,2), 
-           "taud.L2" = runif(1,0,2),
-           "taub0.L2" = runif(1,0,2),
+           "taub.L2" =  runif(q,0,2), 
+           "taud.L2" =  runif(q,0,2),
+           "taub0.L2" = runif(q,0,2),
            
            "sigma.VC1" = runif(nz0,0.25,2),
            "t" = runif(nz0,0.25,1),         
@@ -174,6 +176,7 @@ function(y, n, q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,
     }
   }}
   op<- system.file("bugs", "joint_2z0.bug", package="zoib") 
+ 
   model <- jags.model(op, data = dataIn, n.adapt=0, inits=inits.internal, n.chains=n.chain)   
   return(model)
 }

@@ -54,7 +54,7 @@ model
       
       b[i+1,j] <- inprod(b.tmp[i,j, ],prior1[1, ,j])   	
    	}
-    taub.L2[j] ~ dgamma(hyper[,j,1,4],hyper[j,1,4]);  # L2 (ridge)
+    taub.L2[j] ~ dgamma(hyper[j,1,4],hyper[j,1,4]);  # L2 (ridge)
     
      
     tmp2[j] ~ dnorm(0, hyper[j,2,1])

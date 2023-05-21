@@ -87,7 +87,7 @@ model
     
     
     tmp3[j]~ dnorm(0, hyper[j,3,1])
-    b1[1,j] <- inflate1*tmp3[j]; 
+    b1[1,j] <- inflate1[j]*tmp3[j]; 
     
     for(i in 1:(p.x1-1))
   	{
@@ -180,3 +180,4 @@ model
 
   Sigma.UN <- Sigma.UN1*prior2[2,1] +Sigma.UN2*prior2[2,2]   
 
+}

@@ -96,6 +96,6 @@ function(y, n, xmu.1, p.xmu, xsum.1, p.xsum,
       inits.internal[[i]][[12]]<- inits[[i]]$sigma}
   }}
   op<- system.file("bugs", "sep_1z.bug",package="zoib") 
-  model <- jags.model(op, data=dataIn,n.adapt=0,inits=inits.internal,n.chains=n.chain)  
+   model <- jags.model(op, data=dataIn,n.adapt=0,inits=inits.internal,n.chains=n.chain)  
   return(model)
 }

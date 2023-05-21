@@ -170,7 +170,7 @@ function(
   else if(link.x1=="cloglog") link[3,2]<- 1
   else if(link.x1=="probit") link[3,3]<- 1
 
-  # prior.beta choice; 4 link funtions (rows), each with 4 choices (columns).
+  # prior.beta choice; 4 link functions (rows), each with 4 choices (columns).
   prior1 <- array(0,c(4,4,q))
   for(j in 1:q){
     for(i in 1:4){ 
@@ -475,11 +475,14 @@ function(
         para.list <- c(para.list, "ypred") # "phi" 
         #print(para.list)
         post.samples[[i]]<- coda.samples(model[[i]], para.list, thin=n.thin, n.iter=n.iter)
+        # print(post.samples)
         
         dim.para  <- dim(post.samples[[i]][[1]]) 
+        #print(dim.para)
         name.para <- colnames(post.samples[[i]][[1]])
         post.samples.raw <- post.samples
         
+     
         for(k in 1:dim.para[2]){       
           if(grepl("b0",name.para[k])){
             if(p.x0 > 1){ 
@@ -546,7 +549,7 @@ function(
                               link, n.chain, inits, seeds)
           para.list <- c("b","d", "b0","b1","Sigma")}
         else if(all(!one.inflation) & any(zero.inflation)){
-          inflate0 <- rep(1,q)
+          inflate0 <- rep(0,q)
           for(j in 1:q){ 
             if(zero.inflation[j]) inflate0[j]<- 1}
           model<- joint.2z0(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum, x0.1, p.x0,inflate0,
@@ -588,7 +591,7 @@ function(
                              inits, seeds)
           para.list <- c("b","d", "b0","b1","sigma")}
         else if(all(!one.inflation) & any(zero.inflation)) { 
-          inflate0 <- rep(1,q)
+          inflate0 <- rep(0,q)
           for(j in 1:q){ 
             if(zero.inflation[j]) inflate0[j]<- 1}
           
@@ -601,7 +604,7 @@ function(
           inflate1 <- rep(0,q)
           for(j in 1:q){ 
             if(one.inflation[j]) inflate1[j]<- 1}
-          
+
           model<- joint.1z1(y,n,q, xmu.1, p.xmu, xsum.1, p.xsum,x1.1, p.x1,inflate1,
                             rid, EUID1, nEU, prior1, prior2, prior.beta, prior.Sigma,
                             prec.int, prec.DN,lambda.L1, lambda.L2, lambda.ARD,
@@ -616,10 +619,13 @@ function(
       }
       para.list <- c(para.list, "ypred") # "phi" 
       #print(para.list)
+      
       post.samples <- coda.samples(model, para.list, thin=n.thin, n.iter=n.iter)
-
+      #print(post.samples)
       
       dim.para  <- dim(post.samples[[1]]) 
+      #print(dim.para)
+      
       name.para <- colnames(post.samples[[1]])
       post.samples.raw <- post.samples
       for(k in 1:dim.para[2]){       
@@ -666,7 +672,7 @@ function(
         break}}
     }
   }
-  # construct Desigm Matrix X
+  # construct Design Matrix X
   
   Xbeta.mean <- xmu
   Xbeta.sum <- xsum
@@ -694,86 +700,125 @@ function(
         }}
   }
 
+  #print(post.samples.raw)
+  #print(post.samples.raw[[1]][[1]])
+  
+  yobs=c(y)
+  howmany <- length(yobs)
+  res.names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
   nburn <- n.burn/n.thin
-  ypredcol <-  which(substr(colnames(post.samples.raw[[1]]),1,5)=="ypred")
+  if((!joint) & q>1){
+      coeff.tmp = NULL
+      ypred.tmp = NULL
+      res.tmp = NULL
+      for(l in 1:q){
+        ypredcol <-  which(substr(colnames(post.samples.raw[[l]][[1]]),1,5)=="ypred")
+        coeff.tmp <- cbind(coeff.tmp, post.samples.raw[[l]][[1]][-(1:nburn),1:(ypredcol[1]-1)])
+        ypred.tmp <- cbind(ypred.tmp, post.samples.raw[[l]][[1]][-(1:nburn),ypredcol])
+      }
+      res.tmp<-  yobs-ypred.tmp 
+      colnames(res.tmp)<- res.names
+      coeff<- list(mcmc(coeff.tmp))
+      ypred<- list(mcmc(ypred.tmp))
+      resid<- list(mcmc(res.tmp))
+  }
+  else {
+    ypredcol <-  which(substr(colnames(post.samples.raw[[1]]),1,5)=="ypred")
+    coeff<- list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]))
+    ypred<- list(mcmc(post.samples.raw[[1]][-(1:nburn),ypredcol]))
+    resid <- yobs-ypred[[1]]; 
+    colnames(resid)<- res.names
+    resid<- list(mcmc(resid))
+  }
   #phicol <-  which(substr(colnames(post.samples.raw[[1]]),1,3)=="phi")
   #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(phicol[1]-1)]),
   #                   mcmc(post.samples.raw[[2]][-(1:nburn),1:(phicol[1]-1)]))
-  
-  coeff<- list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]))
-  ypred<- list(mcmc(post.samples.raw[[1]][-(1:nburn),ypredcol]))
-  
-  # residuals
-  yobs <- c(y); 
-  howmany <- length(yobs)
-  res.names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
-  resid <- yobs-ypred[[1]]; 
-  colnames(resid)<- res.names
-  resid <- list(resid)
-  
+
   # standardized residuals
+
   rstd.names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
   resid.std <- resid[[1]]/apply(resid[[1]],2,sd); 
   colnames(resid.std)<- rstd.names
   resid.std <- list(resid.std)
-  
+ 
   for(k in 2:n.chain) {
     coeff<- c(coeff,k)
-    coeff[[k]]<- mcmc(post.samples.raw[[k]][-(1:nburn),1:(ypredcol[1]-1)])
-    
     ypred<- c(ypred,k)
-    ypred[[k]]<- mcmc(post.samples.raw[[k]][-(1:nburn),ypredcol])
-    
     resid<- c(resid,k)
-    tmp<- yobs- post.samples.raw[[k]][-(1:nburn),ypredcol]
-    colnames(tmp)<- res.names
-    resid[[k]] <- mcmc(tmp)
     
+    if(!joint & q>1){
+      coeff.tmp = NULL
+      ypred.tmp = NULL
+      for(l in 1:q){
+        ypredcol <-  which(substr(colnames(post.samples.raw[[l]][[k]]),1,5)=="ypred")
+        coeff.tmp <- cbind(coeff.tmp, post.samples.raw[[l]][[k]][-(1:nburn),1:(ypredcol[1]-1)])
+        ypred.tmp <- cbind(ypred.tmp, post.samples.raw[[l]][[k]][-(1:nburn),ypredcol])
+       }
+      resid.tmp<-  yobs- ypred.tmp 
+      colnames(resid.tmp)<- res.names
+      coeff[[k]]<- mcmc(coeff.tmp)
+      ypred[[k]]<- mcmc(ypred.tmp)
+      resid[[k]]<- mcmc(resid.tmp)
+      
+    }
+    else{
+      coeff[[k]]<- mcmc(post.samples.raw[[k]][-(1:nburn),1:(ypredcol[1]-1)])
+      ypred[[k]]<- mcmc(post.samples.raw[[k]][-(1:nburn),ypredcol])
+      tmp<- yobs- post.samples.raw[[k]][-(1:nburn),ypredcol]
+      colnames(tmp)<- res.names
+      resid[[k]] <- mcmc(tmp)
+    }
     resid.std<- c(resid.std,k)
     tmp <- resid[[k]]/apply(resid[[k]],2,sd); 
     colnames(tmp)<- rstd.names
-    resid.std[[k]] <- mcmc(tmp)}
-  
+    resid.std[[k]] <- mcmc(tmp)
+    }
+
   coeff<- mcmc.list(coeff)
   ypred<- mcmc.list(ypred)
   resid<- mcmc.list(resid)
   resid.std<- mcmc.list(resid.std)
- 
-  #coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
-  #                   mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
-                     
-  # pred1 <- post.samples.raw[[1]][-(1:nburn),ypredcol]
-  # pred2 <- post.samples.raw[[2]][-(1:nburn),ypredcol] 
-  # ypred <- mcmc.list(mcmc(pred1), mcmc(pred2))
-
-  # yobs <- c(y); 
-  # howmany <- length(yobs)
-  # names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
-  #resid1 <- yobs-pred1; colnames(resid1)<- names
-  #resid2 <- yobs-pred2; colnames(resid2)<- names
-  #resid <- mcmc.list(mcmc(resid1), mcmc(resid2))
+  # print(coeff)
   
-  # standardized residuals
-  # names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
-  # resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
-  # resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
-  # resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
-
-  orinames <- colnames(coeff[[1]])
-  newnames <- orinames
-  n.orinames <- length(orinames)
- 
-  tmp<- which(substr(orinames,1,1)=='d')
-  newname<- colnames(Xbeta.sum); newname<-rep(newname, q)
-  for(k in 1:length(tmp)){
-    #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],2,nchar(orinames[tmp[k]])),sep="")
-    newnames[tmp[k]]<- newname[k]
+  if(0){
+    coeff <- mcmc.list(mcmc(post.samples.raw[[1]][-(1:nburn),1:(ypredcol[1]-1)]),
+                       mcmc(post.samples.raw[[2]][-(1:nburn),1:(ypredcol[1]-1)]))
+                       
+     pred1 <- post.samples.raw[[1]][-(1:nburn),ypredcol]
+     pred2 <- post.samples.raw[[2]][-(1:nburn),ypredcol] 
+     ypred <- mcmc.list(mcmc(pred1), mcmc(pred2))
+  
+     yobs <- c(y); 
+     howmany <- length(yobs)
+     names <- paste(rep("r",howmany),as.character(1:howmany),sep="")
+    resid1 <- yobs-pred1; colnames(resid1)<- names
+    resid2 <- yobs-pred2; colnames(resid2)<- names
+    resid <- mcmc.list(mcmc(resid1), mcmc(resid2))
+    
+     # standardized residuals
+     names <- paste(rep("rstd",howmany),as.character(1:howmany),sep="")
+     resid1 <- resid1/apply(resid1,2,sd); colnames(resid1)<- names
+     resid2 <- resid2/apply(resid2,2,sd); colnames(resid2)<- names
+     resid.std <-  mcmc.list(mcmc(resid1), mcmc(resid2))
   }
-  tmp<- which(substr(orinames,1,2)=='b[')
-  newname<- colnames(Xbeta.mean); newname<-rep(newname, q)
-  for(k in 1:length(tmp)){
-    #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],2,nchar(orinames[tmp[k]])),sep="")
-    newnames[tmp[k]]<- newname[k]
+  
+ if(0){
+   if(!joint & q==1){
+    orinames <- colnames(coeff[[1]])
+    newnames <- orinames
+    n.orinames <- length(orinames)
+   
+    tmp<- which(substr(orinames,1,1)=='d')
+    newname<- colnames(Xbeta.sum); newname<-rep(newname, q)
+    for(k in 1:length(tmp)){
+      #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],2,nchar(orinames[tmp[k]])),sep="")
+      newnames[tmp[k]]<- newname[k]
+    }
+    tmp<- which(substr(orinames,1,2)=='b[')
+    newname<- colnames(Xbeta.mean); newname<-rep(newname, q)
+    for(k in 1:length(tmp)){
+      #newnames[tmp[k]]<-paste(newname[k],substr(orinames[tmp[k]],2,nchar(orinames[tmp[k]])),sep="")
+      newnames[tmp[k]]<- newname[k]
   }    
   tmp0<- any(substr(orinames,1,2)=='b0');
   if(tmp0){
@@ -796,21 +841,57 @@ function(
   for(i in 1:n.chain){
     colnames(coeff[[i]])=newnames
   }
-  print("NOTE: in the header of Markov Chain Monte Carlo (MCMC) output of")
+ }
+ }
+
+  if(joint & q>1){
+    for(i in 1:n.chain){
+      tmp<- coeff[[i]]
+      howmany <- ncol(tmp)
+      tmp.names<- colnames(tmp)
+      #print(tmp.names)
+      reorder<- matrix(0,q, howmany)
+      for(k in 1:q){
+        count<- 0
+        for(j in 1:howmany){
+          nc <- nchar(tmp.names[j])
+          if(substr(tmp.names[j],nc-1,nc-1)==as.character(k)) {
+            count<- count+1
+            reorder[k,count] = j}
+        }
+      }
+      
+      tmp.coeff <- NULL
+      for(k in 1:q) tmp.coeff<- cbind(tmp.coeff,coeff[[i]][,reorder[k,]])
+      # print(tmp.coeff)
+      
+      coeff[[i]] <- tmp.coeff 
+      rem<- NULL
+      for(j in 1:ncol(tmp.coeff)){
+        if(sum(tmp.coeff[1:2,j])==0) rem<- c(rem,j)}
+      if(!is.null(rem)) coeff[[i]]<- tmp.coeff[,-rem]
+    }}
+
+  print("NOTE: in the header of Markov Chain Monte Carlo (MCMC) output of    ")
   print("parameters (coeff), predicted values (ypred), residuals (resid), and")
-  print("standardized residuals (resid.std), *Start, End, Thinning Interval*")
-  print("values are after the initial burning and thinning periods specified")
-  print("by the user. For example, n.iter = 151, n.thin = 2, n.burn=1,")
-  print("then MCMC header of the *coeff* output would read as follows") 
-  print("-----------------------------------------")
+  print("standardized residuals (resid.std), *Start, End, Thinning Interval* ")
+  print("values are after the initial burning and thinning periods specified ")
+  print("by the user. For example, n.iter = 151, n.thin = 2, n.burn=1,       ")
+  print("then MCMC header of the *coeff* output would read as follows        ") 
+  print("--------------------------------------------------------------------")
   print("Markov Chain Monte Carlo (MCMC) output:")
   print("Start = 1")
   print("End = 75")
   print("Thinning interval = 1")
-  print("                                         ")
-  print("                                         ")
-  print("Coefficients are presented in the order of b, ")
-  print("b0 (if zero.inflation=TRUE), b1 (if one.inflation=TRUE), and d")
+  print("--------------------------------------------------------------------")
+  print("                                                                    ")
+  print("Coefficients are presented in the order of b, b0 (if zero.inflation=TRUE),")
+  print("b1 (if one.inflation=TRUE), and d. If the names of independent variables X")
+  print("are not shown for the coefficients within each type (b, b0, b1, d), the   ")
+  print("first coeffient is always the intercept, followed the coefficients for the")
+  print("X's in the order as how they are entered in the model specification.      ")
+  print("--------------------------------------------------------------------------")
+  
   return(list(model= model.format, MCMC.model= model, 
               Xb= Xbeta.mean, Xd= Xbeta.sum, Xb0= x0, Xb1=x1, 
               coeff= coeff, ypred= ypred, yobs= yobs, 

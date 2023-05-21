@@ -24,12 +24,12 @@ model
   
       # 3: zero
       logit(ph2[i,j,1])  <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]     
-      cloglog(ph2[i,j,2])<- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]     
+      cloglog(ph2[i,j,2])<- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]    
       probit(ph2[i,j,3]) <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[3])*inflate0[j]     
       p0[i,j]<- inprod(ph2[i,j, ],link[2,])   
   
-      ll[i,j]<- d0[i,j]*log(p0[i,j])+(1-d0[i,j])*log(1-p0[i,j])+
-                (1-d0[i,j])*((s1[i,j]-1)*log(y[i,j])+(s2[i,j]-1)*log(1-y[i,j])+
+      ll[i,j]<- d0[i,j]*log(p0[i,j])*inflate0[j] +(1-d0[i,j])*log(1-p0[i,j])*inflate0[j] +
+                (1-d0[i,j])*((s1[i,j]-1)*log(y[i,j])*inflate0[j] +(s2[i,j]-1)*log(1-y[i,j])+
                   loggam(s1[i,j]+s2[i,j])-loggam(s1[i,j])-loggam(s2[i,j]))
       trick[i,j] <- K-ll[i,j]  
       zero[i,j] ~ dpois(trick[i,j])    
@@ -87,7 +87,7 @@ model
 
     
     tmp3[j]~ dnorm(0, hyper[j,3,1]) 
-    b0[1,j] <- inflate0*tmp3[j]; 
+    b0[1,j] <- inflate0[j]*tmp3[j]; 
     for(i in 1:(p.x0-1))
   	{
   		b0.tmp[i,j,1] ~ dnorm(0, hyper[j,3,2]) 

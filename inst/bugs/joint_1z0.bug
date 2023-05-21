@@ -23,10 +23,10 @@ model
       s2[i,j]<- den[i,j]*(1-mu[i,j])  
   
       # 4: zero
-      logit(ph3[i,j,1])  <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[4])*inflate0[j]
-      cloglog(ph3[i,j,2])<- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[4])*inflate0[j]
-      probit(ph3[i,j,3]) <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[4])*inflate0[j]
-      p0[i,j]<- inprod(ph3[i,j, ],link[3,])   
+      logit(ph3[i,j,1])  <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[4])
+      cloglog(ph3[i,j,2])<- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[4])
+      probit(ph3[i,j,3]) <- (inprod(b0[,j], x0.1[i,])  + random[i]*rid[4])
+      p0[i,j]<- inprod(ph3[i,j, ],link[3,])*inflate0[j]   
      
       ll[i,j]<- d0[i,j]*log(p0[i,j])+(1-d0[i,j])*log(1-p0[i,j])+
                 (1-d0[i,j])*((s1[i,j]-1)*log(y[i,j])+(s2[i,j]-1)*log(1-y[i,j])+
@@ -86,7 +86,7 @@ model
     
     
     tmp3[j]~ dnorm(0, hyper[j,3,1])
-    b0[1,j] <- inflate0*tmp3[j]; 
+    b0[1,j] <- inflate0[j]*tmp3[j]; 
     for(i in 1:(p.x0-1))
   	{
   		b0.tmp[i,j,1] ~ dnorm(0, hyper[j,3,2]) 
@@ -115,7 +115,7 @@ model
     alpha[i] ~ dnorm(0,invsigma) }
   sigma <- inverse(invsigma)
   
-  sigma1 ~ dunif(0, hyper6) # uniform 
+  sigma1 ~ dunif(0, hyper2) # uniform 
     
   scale2 ~ dt(0, pow(hyper2,-2), 1); 
   sigma2 <- abs(scale2) 

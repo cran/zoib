@@ -1,7 +1,6 @@
 model
 {
   K <-1000
-
   for(i in 1:n)
   {	   	
     random[i] <- alpha[EUID[i]]
@@ -23,9 +22,9 @@ model
       s2[i,j]<- den[i,j]*(1-mu[i,j])  
   
       # 4: one
-      logit(ph3[i,j,1])  <- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])*inflate1[j]
-      cloglog(ph3[i,j,2])<- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])*inflate1[j]
-      probit(ph3[i,j,3]) <- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])*inflate1[j]
+      logit(ph3[i,j,1])  <- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])
+      cloglog(ph3[i,j,2])<- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])
+      probit(ph3[i,j,3]) <- (inprod(b1[,j], x1.1[i,])  + random[i]*rid[4])
       p1[i,j]<- inprod(ph3[i,j, ],link[3,])*inflate1[j]
      
       ll[i,j]<- d1[i,j]*log(p1[i,j])+(1-d1[i,j])*log(1-p1[i,j])+ 
@@ -85,7 +84,7 @@ model
     
 
     tmp3[j] ~ dnorm(0, hyper[j,4,1]) 
-    b1[1,j] <- inflate1*tmp3[j]; 
+    b1[1,j] <- inflate1[j]*tmp3[j]; 
     for(i in 1:(p.x1-1))
   	{
   		b1.tmp[i,j,1] ~ dnorm(0, hyper[j,4,2]) 
