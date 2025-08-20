@@ -1,9 +1,10 @@
 #useDynLib(zoib)
 import(coda)
 import(rjags)
-import(Formula)
 import(abind)
+import(Formula)
 importFrom("graphics", "axis", "boxplot", "legend", "mtext", "par","plot", "points", "segments", "text")
 importFrom("stats", "model.frame", "model.matrix", "rnorm", "runif","sd", "var","median","quantile")
+importFrom("Formula", "as.Formula", "model.part")
 export(check.psrf, zoib, paraplot, pred.zoib)
 

@@ -1,5 +1,5 @@
-924859ad91cd6e573bb0d09a0bc51e41 *DESCRIPTION
-c521582433dc2e354db638d63434bb82 *NAMESPACE
+16458c0a3e422b71ae3f5f975ce07bdf *DESCRIPTION
+d377d13e1aafddb3c13ad7b0d8bfb7d8 *NAMESPACE
 3c80dd99bbfe801004c3414f135b530c *R/check.psrf.R
 6c3a8009b300828750f3520e130382c9 *R/fixed.R
 148148a33cd052f3a336d002448063d3 *R/fixed0.R
@@ -74,7 +74,7 @@ ac9fcdb1d243b3aa3d2e26ebcf0beedc *man/sep.1z1.Rd
 80a88756fda83b862ee2a70b54d3aa0a *man/sep.2z0.Rd
 4ce06cbf4b8978554a6c1c0222f3fb0c *man/sep.2z01.Rd
 24e08dd02181cf41bd428b67e45af824 *man/sep.2z1.Rd
-c6ae6353d4e292399f7efe09c79b16de *man/zoib-package.Rd
-510742fbfa66212588ee75cbcbe2323d *man/zoib.Rd
+8f9c4f6feafb75b0e93b995e208cb035 *man/zoib-package.Rd
+6d23401390e56e404babb298b44e4071 *man/zoib.Rd
 7efb3bb18be50ad6676defec363dd488 *tests/test1.R
 f5c379c01c05f264db3aef06eba260ce *tests/test2.R
